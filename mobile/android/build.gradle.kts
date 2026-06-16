@@ -17,9 +17,13 @@ subprojects {
 }
 subprojects {
     project.evaluationDependsOn(":app")
-    project.plugins.withId("com.android.library") {
-        project.extensions.configure<com.android.build.gradle.LibraryExtension>("android") {
-            compileSdk = 36
+}
+allprojects {
+    plugins.withId("com.android.library") {
+        extensions.configure<com.android.build.gradle.LibraryExtension>("android") {
+            if (compileSdk != null && compileSdk!! < 36) {
+                compileSdk = 36
+            }
         }
     }
 }
