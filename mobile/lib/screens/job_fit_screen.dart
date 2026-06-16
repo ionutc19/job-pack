@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:file_picker/file_picker.dart';
-import 'dart:io';
 import '../models/job_fit.dart';
 import '../services/service_locator.dart';
 import '../widgets/loading_button.dart';
@@ -18,32 +16,12 @@ class _JobFitScreenState extends State<JobFitScreen> {
   final _cvController = TextEditingController();
   final _jdController = TextEditingController();
   bool _isLoading = false;
-  String? _fileName;
 
   @override
   void dispose() {
     _cvController.dispose();
     _jdController.dispose();
     super.dispose();
-  }
-
-  Future<void> _pickFile() async {
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['pdf', 'txt'],
-    );
-    if (result != null && result.files.single.path != null) {
-      final file = File(result.files.single.path!);
-      final extension = result.files.single.extension;
-      setState(() => _fileName = result.files.single.name);
-
-      if (extension == 'txt') {
-        final content = await file.readAsString();
-        _cvController.text = content;
-      } else {
-        _cvController.text = '[PDF uploaded: ${result.files.single.name}] — PDF text extraction will be added in a future update. For now, please paste your CV text below.';
-      }
-    }
   }
 
   Future<void> _analyze() async {
@@ -95,21 +73,12 @@ class _JobFitScreenState extends State<JobFitScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Upload or paste your CV, then paste the job description to see how well you match.',
+                'Paste your CV and the job description to see how well you match.',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Colors.grey.shade600,
                     ),
               ),
               const SizedBox(height: 20),
-              OutlinedButton.icon(
-                onPressed: _pickFile,
-                icon: const Icon(Icons.upload_file),
-                label: Text(_fileName ?? 'Upload CV (PDF or TXT)'),
-                style: OutlinedButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 48),
-                ),
-              ),
-              const SizedBox(height: 12),
               TextFormField(
                 controller: _cvController,
                 maxLines: 6,
