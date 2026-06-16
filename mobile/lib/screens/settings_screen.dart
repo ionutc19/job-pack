@@ -4,6 +4,7 @@ import '../config/app_config.dart';
 import '../l10n/app_localizations.dart';
 import '../l10n/language_provider.dart';
 import '../services/service_locator.dart';
+import '../widgets/language_dropdown.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -52,16 +53,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             leading: const Icon(Icons.language),
             title: Text(l.language),
             subtitle: Text(langProvider.locale.languageCode == 'ro' ? l.romanian : l.english),
-            trailing: SegmentedButton<String>(
-              segments: [
-                ButtonSegment(value: 'en', label: Text(l.english)),
-                ButtonSegment(value: 'ro', label: Text(l.romanian)),
-              ],
-              selected: {langProvider.locale.languageCode},
-              onSelectionChanged: (v) {
-                langProvider.setLocale(Locale(v.first));
-              },
-            ),
+            trailing: const LanguageDropdown(),
           ),
           ListTile(
             leading: const Icon(Icons.science_outlined),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
+import '../widgets/language_dropdown.dart';
 
 class LandingScreen extends StatelessWidget {
   const LandingScreen({super.key});
@@ -13,6 +14,10 @@ class LandingScreen extends StatelessWidget {
           padding: const EdgeInsets.all(24),
           child: Column(
             children: [
+              const Align(
+                alignment: Alignment.topRight,
+                child: LanguageDropdown(),
+              ),
               const Spacer(),
               Icon(
                 Icons.work_outline,
