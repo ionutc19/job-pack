@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 import '../models/job_fit.dart';
 import '../services/service_locator.dart';
 import '../widgets/loading_button.dart';
@@ -30,17 +31,20 @@ class _JobFitScreenState extends State<JobFitScreen> {
     setState(() => _isLoading = true);
     try {
       final locator = ServiceLocator();
+      final lang = AppLocalizations.of(context).languageCode;
       late final JobFitResult result;
 
       if (locator.useMocks) {
         result = await locator.mock.analyzeJobFit(
           cvText: _cvController.text,
           jobDescription: _jdController.text,
+          language: lang,
         );
       } else {
         result = await locator.api.analyzeJobFit(
           cvText: _cvController.text,
           jobDescription: _jdController.text,
+          language: lang,
         );
       }
 
@@ -53,7 +57,7 @@ class _JobFitScreenState extends State<JobFitScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
+          SnackBar(content: Text('${AppLocalizations.of(context).error}: $e')),
         );
       }
     } finally {
@@ -63,8 +67,9 @@ class _JobFitScreenState extends State<JobFitScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Job Fit Analysis')),
+      appBar: AppBar(title: Text(l.jobFitAnalysis)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -73,7 +78,7 @@ class _JobFitScreenState extends State<JobFitScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Paste your CV and the job description to see how well you match.',
+                l.jobFitInstructions,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Colors.grey.shade600,
                     ),
@@ -82,29 +87,27 @@ class _JobFitScreenState extends State<JobFitScreen> {
               TextFormField(
                 controller: _cvController,
                 maxLines: 6,
-                decoration: const InputDecoration(
-                  labelText: 'CV / Resume Text',
-                  hintText: 'Paste your CV content here...',
+                decoration: InputDecoration(
+                  labelText: l.cvResumeText,
+                  hintText: l.cvHint,
                   alignLabelWithHint: true,
                 ),
-                validator: (v) =>
-                    (v == null || v.length < 10) ? 'Please enter at least 10 characters' : null,
+                validator: (v) => (v == null || v.length < 10) ? l.minCharsError : null,
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _jdController,
                 maxLines: 6,
-                decoration: const InputDecoration(
-                  labelText: 'Job Description',
-                  hintText: 'Paste the job posting here...',
+                decoration: InputDecoration(
+                  labelText: l.jobDescription,
+                  hintText: l.jobDescriptionHint,
                   alignLabelWithHint: true,
                 ),
-                validator: (v) =>
-                    (v == null || v.length < 10) ? 'Please enter at least 10 characters' : null,
+                validator: (v) => (v == null || v.length < 10) ? l.minCharsError : null,
               ),
               const SizedBox(height: 24),
               LoadingButton(
-                label: 'Analyze Match',
+                label: l.analyzeMatch,
                 icon: Icons.analytics,
                 isLoading: _isLoading,
                 onPressed: _analyze,

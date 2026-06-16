@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field
 class JobFitRequest(BaseModel):
     cv_text: str = Field(..., min_length=10, description="CV/resume content")
     job_description: str = Field(..., min_length=10, description="Job posting text")
+    language: str = Field(default="en", pattern="^(en|ro)$")
 
 
 class KeywordGap(BaseModel):
@@ -27,6 +28,7 @@ class ProfileBoostRequest(BaseModel):
     headline: str = ""
     about: str = ""
     experience: str = ""
+    language: str = Field(default="en", pattern="^(en|ro)$")
 
 
 class ProfileBoostResponse(BaseModel):
@@ -40,6 +42,7 @@ class ApplyLetterRequest(BaseModel):
     cv_text: str = Field(..., min_length=10)
     job_description: str = Field(..., min_length=10)
     tone: str = Field(default="professional", pattern="^(professional|casual|enthusiastic)$")
+    language: str = Field(default="en", pattern="^(en|ro)$")
 
 
 class ApplyLetterResponse(BaseModel):

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 import '../models/job_fit.dart';
 import '../widgets/score_indicator.dart';
 import '../widgets/section_card.dart';
@@ -11,8 +12,9 @@ class JobFitResultsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Analysis Results')),
+      appBar: AppBar(title: Text(l.analysisResults)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -28,7 +30,7 @@ class JobFitResultsScreen extends StatelessWidget {
             const SizedBox(height: 24),
             if (result.missingKeywords.isNotEmpty)
               SectionCard(
-                title: 'Missing Keywords',
+                title: l.missingKeywords,
                 icon: Icons.warning_amber_outlined,
                 child: Column(
                   children: result.missingKeywords
@@ -40,7 +42,7 @@ class JobFitResultsScreen extends StatelessWidget {
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 8, vertical: 2),
                                   decoration: BoxDecoration(
-                                    color: gap.importance == 'high'
+                                    color: gap.importance == 'high' || gap.importance == 'ridicat'
                                         ? AppTheme.errorColor.withOpacity(0.1)
                                         : Colors.orange.withOpacity(0.1),
                                     borderRadius: BorderRadius.circular(4),
@@ -50,7 +52,7 @@ class JobFitResultsScreen extends StatelessWidget {
                                     style: TextStyle(
                                       fontSize: 10,
                                       fontWeight: FontWeight.bold,
-                                      color: gap.importance == 'high'
+                                      color: gap.importance == 'high' || gap.importance == 'ridicat'
                                           ? AppTheme.errorColor
                                           : Colors.orange,
                                     ),
@@ -67,7 +69,7 @@ class JobFitResultsScreen extends StatelessWidget {
             if (result.bulletSuggestions.isNotEmpty) ...[
               const SizedBox(height: 8),
               SectionCard(
-                title: 'Suggested Improvements',
+                title: l.suggestedImprovements,
                 icon: Icons.lightbulb_outline,
                 child: Column(
                   children: result.bulletSuggestions
@@ -77,7 +79,7 @@ class JobFitResultsScreen extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Before:',
+                                  l.before,
                                   style: TextStyle(
                                     fontSize: 12,
                                     color: Colors.grey.shade500,
@@ -89,7 +91,7 @@ class JobFitResultsScreen extends StatelessWidget {
                                         color: Colors.grey)),
                                 const SizedBox(height: 4),
                                 Text(
-                                  'After:',
+                                  l.after,
                                   style: TextStyle(
                                     fontSize: 12,
                                     color: AppTheme.successColor,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../l10n/app_localizations.dart';
 import '../services/service_locator.dart';
 import '../widgets/loading_button.dart';
 import '../widgets/section_card.dart';
@@ -32,11 +33,13 @@ class _CoverLetterScreenState extends State<CoverLetterScreen> {
     setState(() => _isLoading = true);
     try {
       final locator = ServiceLocator();
+      final lang = AppLocalizations.of(context).languageCode;
       if (locator.useMocks) {
         final result = await locator.mock.generateCoverLetter(
           cvText: _cvController.text,
           jobDescription: _jdController.text,
           tone: _tone,
+          language: lang,
         );
         _coverLetter = result.coverLetter;
       } else {
@@ -44,6 +47,7 @@ class _CoverLetterScreenState extends State<CoverLetterScreen> {
           cvText: _cvController.text,
           jobDescription: _jdController.text,
           tone: _tone,
+          language: lang,
         );
         _coverLetter = result.coverLetter;
       }
@@ -51,7 +55,7 @@ class _CoverLetterScreenState extends State<CoverLetterScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
+          SnackBar(content: Text('${AppLocalizations.of(context).error}: $e')),
         );
       }
     } finally {
@@ -61,8 +65,9 @@ class _CoverLetterScreenState extends State<CoverLetterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Cover Letter')),
+      appBar: AppBar(title: Text(l.coverLetter)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -71,7 +76,7 @@ class _CoverLetterScreenState extends State<CoverLetterScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Generate a personalized cover letter based on your CV and the job posting.',
+                l.coverLetterInstructions,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Colors.grey.shade600,
                     ),
@@ -80,41 +85,39 @@ class _CoverLetterScreenState extends State<CoverLetterScreen> {
               TextFormField(
                 controller: _cvController,
                 maxLines: 5,
-                decoration: const InputDecoration(
-                  labelText: 'CV / Resume Text',
-                  hintText: 'Paste your CV content...',
+                decoration: InputDecoration(
+                  labelText: l.cvResumeText,
+                  hintText: l.cvHint,
                   alignLabelWithHint: true,
                 ),
-                validator: (v) =>
-                    (v == null || v.length < 10) ? 'Please enter at least 10 characters' : null,
+                validator: (v) => (v == null || v.length < 10) ? l.minCharsError : null,
               ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _jdController,
                 maxLines: 5,
-                decoration: const InputDecoration(
-                  labelText: 'Job Description',
-                  hintText: 'Paste the job posting...',
+                decoration: InputDecoration(
+                  labelText: l.jobDescription,
+                  hintText: l.jobDescriptionHint,
                   alignLabelWithHint: true,
                 ),
-                validator: (v) =>
-                    (v == null || v.length < 10) ? 'Please enter at least 10 characters' : null,
+                validator: (v) => (v == null || v.length < 10) ? l.minCharsError : null,
               ),
               const SizedBox(height: 16),
-              Text('Tone', style: Theme.of(context).textTheme.titleSmall),
+              Text(l.tone, style: Theme.of(context).textTheme.titleSmall),
               const SizedBox(height: 8),
               SegmentedButton<String>(
-                segments: const [
-                  ButtonSegment(value: 'professional', label: Text('Professional')),
-                  ButtonSegment(value: 'casual', label: Text('Casual')),
-                  ButtonSegment(value: 'enthusiastic', label: Text('Enthusiastic')),
+                segments: [
+                  ButtonSegment(value: 'professional', label: Text(l.toneProfessional)),
+                  ButtonSegment(value: 'casual', label: Text(l.toneCasual)),
+                  ButtonSegment(value: 'enthusiastic', label: Text(l.toneEnthusiastic)),
                 ],
                 selected: {_tone},
                 onSelectionChanged: (v) => setState(() => _tone = v.first),
               ),
               const SizedBox(height: 24),
               LoadingButton(
-                label: 'Generate Letter',
+                label: l.generateLetter,
                 icon: Icons.description,
                 isLoading: _isLoading,
                 onPressed: _generate,
@@ -122,7 +125,7 @@ class _CoverLetterScreenState extends State<CoverLetterScreen> {
               if (_coverLetter != null) ...[
                 const SizedBox(height: 24),
                 SectionCard(
-                  title: 'Your Cover Letter',
+                  title: l.yourCoverLetter,
                   icon: Icons.description_outlined,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -135,11 +138,11 @@ class _CoverLetterScreenState extends State<CoverLetterScreen> {
                           onPressed: () {
                             Clipboard.setData(ClipboardData(text: _coverLetter!));
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Cover letter copied to clipboard')),
+                              SnackBar(content: Text(l.coverLetterCopied)),
                             );
                           },
                           icon: const Icon(Icons.copy, size: 16),
-                          label: const Text('Copy'),
+                          label: Text(l.copy),
                         ),
                       ),
                     ],

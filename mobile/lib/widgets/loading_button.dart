@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 
 class LoadingButton extends StatelessWidget {
   final String label;
@@ -16,6 +17,7 @@ class LoadingButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton.icon(
@@ -27,7 +29,7 @@ class LoadingButton extends StatelessWidget {
                 child: CircularProgressIndicator(strokeWidth: 2),
               )
             : Icon(icon ?? Icons.send),
-        label: Text(isLoading ? 'Processing...' : label),
+        label: Text(isLoading ? l.processing : label),
       ),
     );
   }

@@ -28,10 +28,12 @@ class ApiService {
   Future<JobFitResult> analyzeJobFit({
     required String cvText,
     required String jobDescription,
+    String language = 'en',
   }) async {
     final data = await _post('/api/job-fit/analyze', {
       'cv_text': cvText,
       'job_description': jobDescription,
+      'language': language,
     });
     return JobFitResult.fromJson(data);
   }
@@ -40,11 +42,13 @@ class ApiService {
     String headline = '',
     String about = '',
     String experience = '',
+    String language = 'en',
   }) async {
     final data = await _post('/api/profile-boost/generate', {
       'headline': headline,
       'about': about,
       'experience': experience,
+      'language': language,
     });
     return ProfileBoostResult.fromJson(data);
   }
@@ -53,11 +57,13 @@ class ApiService {
     required String cvText,
     required String jobDescription,
     String tone = 'professional',
+    String language = 'en',
   }) async {
     final data = await _post('/api/apply-letter/generate', {
       'cv_text': cvText,
       'job_description': jobDescription,
       'tone': tone,
+      'language': language,
     });
     return ApplyLetterResult.fromJson(data);
   }

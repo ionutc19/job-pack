@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 import '../services/service_locator.dart';
 import '../widgets/loading_button.dart';
 
@@ -50,11 +51,10 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
       }
 
       if (mounted) {
+        final l = AppLocalizations.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(success
-                ? 'Thank you! Your feedback has been submitted.'
-                : 'Feedback received (offline mode).'),
+            content: Text(success ? l.feedbackSubmitted : l.feedbackOffline),
           ),
         );
         if (success) Navigator.pop(context);
@@ -62,7 +62,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
+          SnackBar(content: Text('${AppLocalizations.of(context).error}: $e')),
         );
       }
     } finally {
@@ -72,8 +72,9 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Send Feedback')),
+      appBar: AppBar(title: Text(l.sendFeedback)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -82,21 +83,19 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Help us improve Job Pack. Report bugs, request features, or share feedback.',
+                l.feedbackInstructions,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Colors.grey.shade600,
                     ),
               ),
               const SizedBox(height: 20),
-              Text('Category', style: Theme.of(context).textTheme.titleSmall),
+              Text(l.category, style: Theme.of(context).textTheme.titleSmall),
               const SizedBox(height: 8),
               SegmentedButton<String>(
-                segments: const [
-                  ButtonSegment(value: 'bug', label: Text('Bug'), icon: Icon(Icons.bug_report)),
-                  ButtonSegment(
-                      value: 'feature', label: Text('Feature'), icon: Icon(Icons.lightbulb)),
-                  ButtonSegment(
-                      value: 'feedback', label: Text('Feedback'), icon: Icon(Icons.chat)),
+                segments: [
+                  ButtonSegment(value: 'bug', label: Text(l.bug), icon: const Icon(Icons.bug_report)),
+                  ButtonSegment(value: 'feature', label: Text(l.feature), icon: const Icon(Icons.lightbulb)),
+                  ButtonSegment(value: 'feedback', label: Text(l.feedback), icon: const Icon(Icons.chat)),
                 ],
                 selected: {_category},
                 onSelectionChanged: (v) => setState(() => _category = v.first),
@@ -104,38 +103,35 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
               const SizedBox(height: 16),
               TextFormField(
                 controller: _titleController,
-                decoration: const InputDecoration(
-                  labelText: 'Title',
-                  hintText: 'Brief summary...',
+                decoration: InputDecoration(
+                  labelText: l.title,
+                  hintText: l.titleHint,
                 ),
-                validator: (v) =>
-                    (v == null || v.length < 3) ? 'Title must be at least 3 characters' : null,
+                validator: (v) => (v == null || v.length < 3) ? l.titleMinChars : null,
               ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _descriptionController,
                 maxLines: 5,
-                decoration: const InputDecoration(
-                  labelText: 'Description',
-                  hintText: 'Describe the issue or suggestion in detail...',
+                decoration: InputDecoration(
+                  labelText: l.description,
+                  hintText: l.descriptionHint,
                   alignLabelWithHint: true,
                 ),
-                validator: (v) => (v == null || v.length < 10)
-                    ? 'Please provide at least 10 characters'
-                    : null,
+                validator: (v) => (v == null || v.length < 10) ? l.descriptionMinChars : null,
               ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _emailController,
-                decoration: const InputDecoration(
-                  labelText: 'Email (optional)',
-                  hintText: 'For follow-up if needed',
+                decoration: InputDecoration(
+                  labelText: l.emailOptional,
+                  hintText: l.emailHint,
                 ),
                 keyboardType: TextInputType.emailAddress,
               ),
               const SizedBox(height: 24),
               LoadingButton(
-                label: 'Submit Feedback',
+                label: l.submitFeedback,
                 icon: Icons.send,
                 isLoading: _isLoading,
                 onPressed: _submit,

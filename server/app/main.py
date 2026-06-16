@@ -4,9 +4,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.routers import apply_letter, feedback, health, job_fit, profile_boost
 
 app = FastAPI(
-    title="Job Pack API",
+    title="Job Coach API",
     description=(
-        "Backend for the Job Pack mobile app — "
+        "Backend for the Job Coach mobile app — "
         "job fit analysis, profile boost, and cover letter generation."
     ),
     version="0.1.0",

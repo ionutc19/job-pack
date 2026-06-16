@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../l10n/app_localizations.dart';
 import '../models/profile_boost.dart';
 import '../services/service_locator.dart';
 import '../widgets/loading_button.dart';
@@ -28,11 +29,12 @@ class _ProfileBoostScreenState extends State<ProfileBoostScreen> {
   }
 
   Future<void> _generate() async {
+    final l = AppLocalizations.of(context);
     if (_headlineController.text.isEmpty &&
         _aboutController.text.isEmpty &&
         _experienceController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill in at least one field')),
+        SnackBar(content: Text(l.fillOneField)),
       );
       return;
     }
@@ -40,24 +42,27 @@ class _ProfileBoostScreenState extends State<ProfileBoostScreen> {
     setState(() => _isLoading = true);
     try {
       final locator = ServiceLocator();
+      final lang = l.languageCode;
       if (locator.useMocks) {
         _result = await locator.mock.generateProfileBoost(
           headline: _headlineController.text,
           about: _aboutController.text,
           experience: _experienceController.text,
+          language: lang,
         );
       } else {
         _result = await locator.api.generateProfileBoost(
           headline: _headlineController.text,
           about: _aboutController.text,
           experience: _experienceController.text,
+          language: lang,
         );
       }
       setState(() {});
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
+          SnackBar(content: Text('${l.error}: $e')),
         );
       }
     } finally {
@@ -67,22 +72,24 @@ class _ProfileBoostScreenState extends State<ProfileBoostScreen> {
 
   void _copyToClipboard(String text, String label) {
     Clipboard.setData(ClipboardData(text: text));
+    final l = AppLocalizations.of(context);
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('$label copied to clipboard')),
+      SnackBar(content: Text('$label ${l.copiedToClipboard}')),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Profile Boost')),
+      appBar: AppBar(title: Text(l.profileBoost)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Paste your current LinkedIn sections to get AI-powered improvements.',
+              l.profileBoostInstructions,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Colors.grey.shade600,
                   ),
@@ -90,18 +97,18 @@ class _ProfileBoostScreenState extends State<ProfileBoostScreen> {
             const SizedBox(height: 20),
             TextFormField(
               controller: _headlineController,
-              decoration: const InputDecoration(
-                labelText: 'Current Headline',
-                hintText: 'e.g. Software Engineer at TechCo',
+              decoration: InputDecoration(
+                labelText: l.currentHeadline,
+                hintText: l.headlineHint,
               ),
             ),
             const SizedBox(height: 12),
             TextFormField(
               controller: _aboutController,
               maxLines: 4,
-              decoration: const InputDecoration(
-                labelText: 'Current About Section',
-                hintText: 'Paste your LinkedIn About section...',
+              decoration: InputDecoration(
+                labelText: l.currentAbout,
+                hintText: l.aboutHint,
                 alignLabelWithHint: true,
               ),
             ),
@@ -109,15 +116,15 @@ class _ProfileBoostScreenState extends State<ProfileBoostScreen> {
             TextFormField(
               controller: _experienceController,
               maxLines: 4,
-              decoration: const InputDecoration(
-                labelText: 'Current Experience',
-                hintText: 'Paste your latest experience entry...',
+              decoration: InputDecoration(
+                labelText: l.currentExperience,
+                hintText: l.experienceHint,
                 alignLabelWithHint: true,
               ),
             ),
             const SizedBox(height: 24),
             LoadingButton(
-              label: 'Boost My Profile',
+              label: l.boostMyProfile,
               icon: Icons.auto_awesome,
               isLoading: _isLoading,
               onPressed: _generate,
@@ -125,25 +132,28 @@ class _ProfileBoostScreenState extends State<ProfileBoostScreen> {
             if (_result != null) ...[
               const SizedBox(height: 24),
               _ResultSection(
-                title: 'Improved Headline',
+                title: l.improvedHeadline,
                 icon: Icons.title,
                 content: _result!.improvedHeadline,
-                onCopy: () => _copyToClipboard(_result!.improvedHeadline, 'Headline'),
+                copyLabel: l.copy,
+                onCopy: () => _copyToClipboard(_result!.improvedHeadline, l.improvedHeadline),
               ),
               _ResultSection(
-                title: 'Improved About',
+                title: l.improvedAbout,
                 icon: Icons.person,
                 content: _result!.improvedAbout,
-                onCopy: () => _copyToClipboard(_result!.improvedAbout, 'About'),
+                copyLabel: l.copy,
+                onCopy: () => _copyToClipboard(_result!.improvedAbout, l.improvedAbout),
               ),
               _ResultSection(
-                title: 'Improved Experience',
+                title: l.improvedExperience,
                 icon: Icons.work,
                 content: _result!.improvedExperience,
-                onCopy: () => _copyToClipboard(_result!.improvedExperience, 'Experience'),
+                copyLabel: l.copy,
+                onCopy: () => _copyToClipboard(_result!.improvedExperience, l.improvedExperience),
               ),
               SectionCard(
-                title: 'Tips',
+                title: l.tips,
                 icon: Icons.tips_and_updates,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -173,12 +183,14 @@ class _ResultSection extends StatelessWidget {
   final String title;
   final IconData icon;
   final String content;
+  final String copyLabel;
   final VoidCallback onCopy;
 
   const _ResultSection({
     required this.title,
     required this.icon,
     required this.content,
+    required this.copyLabel,
     required this.onCopy,
   });
 
@@ -197,7 +209,7 @@ class _ResultSection extends StatelessWidget {
             child: TextButton.icon(
               onPressed: onCopy,
               icon: const Icon(Icons.copy, size: 16),
-              label: const Text('Copy'),
+              label: Text(copyLabel),
             ),
           ),
         ],

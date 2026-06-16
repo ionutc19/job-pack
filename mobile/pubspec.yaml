@@ -1,4 +1,4 @@
-name: job_pack
+name: job_coach
 description: A mobile-first Android app for job seekers — CV analysis, profile boost, and cover letter generation.
 publish_to: 'none'
 version: 0.1.0+1
@@ -9,8 +9,11 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
   http: ^1.2.0
   provider: ^6.1.0
+  shared_preferences: ^2.3.0
 
 dev_dependencies:
   flutter_test:

@@ -1,36 +1,41 @@
-# Job Pack
+# Job Coach
 
-A mobile-first Android app for job seekers. Analyze job fit, boost your LinkedIn profile, and generate personalized cover letters — all powered by AI.
+A mobile-first Android app for job seekers. Analyze job fit, boost your LinkedIn profile, and generate personalized cover letters — powered by AI, with full English and Romanian support.
 
 ## Features
 
 - **Job Fit Analysis** — Paste your CV and a job description to get a match score, missing keywords, and bullet point improvements
 - **Profile Boost** — Improve your LinkedIn headline, About section, and experience descriptions
-- **Apply Letter** — Generate a concise, personalized cover letter based on your CV and the target job
+- **Cover Letter** — Generate a concise, personalized cover letter based on your CV and the target job
+- **Bilingual** — Full English and Romanian UI and backend responses
 - **Feedback System** — In-app bug reports and feature requests that create GitHub Issues automatically
 
 ## Architecture
 
 ```
 job-pack/
-├── mobile/              # Flutter app (Android-first)
+├── mobile/                  # Flutter app (Android-first)
 │   ├── lib/
-│   │   ├── config/      # App config, theme
-│   │   ├── models/      # Data models
-│   │   ├── screens/     # UI screens
-│   │   ├── services/    # API + mock service layer
-│   │   └── widgets/     # Reusable components
-│   └── test/            # Widget tests
-├── server/              # FastAPI backend
+│   │   ├── config/          # App config, theme
+│   │   ├── l10n/            # Localization (EN/RO) + language provider
+│   │   ├── models/          # Data models
+│   │   ├── screens/         # UI screens (7 screens)
+│   │   ├── services/        # API + mock service layer
+│   │   └── widgets/         # Reusable components
+│   └── test/                # Widget tests
+├── server/                  # FastAPI backend
 │   ├── app/
-│   │   ├── models/      # Pydantic schemas
-│   │   ├── routers/     # API route handlers
-│   │   └── services/    # Business logic (AI, GitHub)
-│   └── tests/           # API tests
-└── .github/workflows/   # CI pipelines
+│   │   ├── models/          # Pydantic schemas (language-aware)
+│   │   ├── routers/         # API route handlers
+│   │   └── services/        # Business logic (AI, GitHub)
+│   ├── tests/               # API tests
+│   └── startup.sh           # Azure App Service startup script
+└── .github/workflows/       # CI pipelines
 ```
 
-The mobile app uses a service locator pattern that switches between mock and real backend services via a compile-time flag (`USE_MOCKS`). The backend uses rule-based responses for now, with a placeholder for real AI provider integration.
+**Service layer**: The mobile app uses a service locator that switches between mock and real backend via the `USE_MOCKS` compile-time flag. The backend returns rule-based responses by default. When `AI_API_KEY` is configured, it can forward to any OpenAI-compatible API (including Azure-hosted models).
+
+**Localization**: The app stores the selected language in SharedPreferences and passes it to the backend as a `language` field. The backend generates all response text in the requested language.
 
 ## Local Setup
 
@@ -42,24 +47,24 @@ The mobile app uses a service locator pattern that switches between mock and rea
 
 ### Environment Variables
 
-Copy the example env file and fill in your values:
-
 ```bash
 cp server/.env.example server/.env
 ```
 
 | Variable | Description | Required |
 |----------|-------------|----------|
-| `AI_PROVIDER` | AI provider name (e.g. `openai`) | No (not used yet) |
-| `AI_BASE_URL` | AI API base URL | No (not used yet) |
-| `AI_API_KEY` | AI API key | No (not used yet) |
-| `AI_MODEL` | Model identifier | No (not used yet) |
+| `AI_PROVIDER` | Provider name (`openai`, `azure`, etc.) | No (rule-based fallback) |
+| `AI_BASE_URL` | AI API base URL | No |
+| `AI_API_KEY` | AI API key | No (enables AI when set) |
+| `AI_MODEL` | Model identifier | No |
 | `AI_TIMEOUT_SECONDS` | Request timeout | No (default: 30) |
 | `GITHUB_TOKEN` | GitHub PAT for creating issues | Yes (for feedback) |
 | `GITHUB_REPO_OWNER` | GitHub repo owner | No (default: ionutc19) |
 | `GITHUB_REPO_NAME` | GitHub repo name | No (default: job-pack) |
 
 ## Running the Backend
+
+### Local development
 
 ```bash
 cd server
@@ -70,6 +75,14 @@ uvicorn app.main:app --reload
 ```
 
 The API will be at `http://localhost:8000`. Interactive docs at `http://localhost:8000/docs`.
+
+### Production (local or VM)
+
+```bash
+cd server
+pip install -r requirements.txt
+gunicorn app.main:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
+```
 
 ### Running Backend Tests
 
@@ -123,24 +136,43 @@ flutter build appbundle --release
 
 The AAB will be at `mobile/build/app/outputs/bundle/release/app-release.aab`.
 
-> Before publishing, you'll need to configure signing in `mobile/android/app/build.gradle.kts` with your upload keystore.
+> Before publishing, configure signing in `mobile/android/app/build.gradle.kts` with your upload keystore.
 
-## Deployment (Single Linux VM)
+## Deployment
 
-A minimal deployment for the backend on a single Linux VM:
+### Azure App Service (Linux)
+
+1. Create a Python 3.11 Linux App Service
+2. Set environment variables in App Service Configuration (all from `.env.example`)
+3. Deploy the `server/` directory (via GitHub Actions, ZIP deploy, or local Git)
+4. Set the startup command:
+   ```
+   startup.sh
+   ```
+   Or directly:
+   ```
+   gunicorn app.main:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
+   ```
+5. The app will be available at `https://your-app.azurewebsites.net`
+
+**For Azure-hosted AI models**, set:
+```
+AI_PROVIDER=azure
+AI_BASE_URL=https://your-resource.openai.azure.com/openai/deployments/your-deployment
+AI_API_KEY=your-azure-key
+AI_MODEL=your-deployment-name
+```
+
+### Single Linux VM
 
 1. Install Python 3.11+ on the server
-2. Clone the repo and set up the venv:
+2. Clone the repo and install:
    ```bash
    cd server && python -m venv .venv && source .venv/bin/activate
    pip install -r requirements.txt
    ```
 3. Create `.env` with production values
-4. Run with gunicorn + uvicorn workers:
-   ```bash
-   pip install gunicorn
-   gunicorn app.main:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
-   ```
+4. Run: `./startup.sh`
 5. Put behind nginx as a reverse proxy with HTTPS (Let's Encrypt)
 6. Use systemd to manage the service
 
@@ -151,9 +183,9 @@ For the mobile app, build the APK/AAB locally and distribute via Google Play or 
 | Method | Path | Description |
 |--------|------|-------------|
 | GET | `/api/health` | Health check |
-| POST | `/api/job-fit/analyze` | Analyze CV vs job description |
-| POST | `/api/profile-boost/generate` | Generate LinkedIn improvements |
-| POST | `/api/apply-letter/generate` | Generate cover letter |
+| POST | `/api/job-fit/analyze` | Analyze CV vs job description (accepts `language`: en/ro) |
+| POST | `/api/profile-boost/generate` | Generate LinkedIn improvements (accepts `language`: en/ro) |
+| POST | `/api/apply-letter/generate` | Generate cover letter (accepts `language`: en/ro) |
 | POST | `/api/feedback` | Submit feedback (creates GitHub Issue) |
 
 ## Troubleshooting
@@ -180,7 +212,7 @@ If `pip install` tries to compile `pydantic-core` from source (requires Rust/MSV
 
 ## Known Next Steps
 
-- [ ] Integrate real AI provider (OpenAI/Anthropic/etc.) via `ai_service.py`
+- [ ] Integrate real AI provider via `call_ai_provider()` in service functions
 - [ ] Add PDF text extraction for CV uploads
 - [ ] Add authentication / rate limiting
 - [ ] Add dark theme support

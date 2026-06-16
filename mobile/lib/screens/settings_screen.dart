@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../config/app_config.dart';
+import '../l10n/app_localizations.dart';
+import '../l10n/language_provider.dart';
 import '../services/service_locator.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -17,13 +20,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
     setState(() => _checking = true);
     final reachable = await ServiceLocator().api.checkHealth();
     if (mounted) {
+      final l = AppLocalizations.of(context);
       setState(() {
         _backendReachable = reachable;
         _checking = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(reachable ? 'Backend is reachable' : 'Backend is not reachable'),
+          content: Text(reachable ? l.backendReachable : l.backendNotReachable),
         ),
       );
     }
@@ -31,29 +35,47 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final langProvider = Provider.of<LanguageProvider>(context);
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: AppBar(title: Text(l.settings)),
       body: ListView(
         children: [
-          const _SectionHeader(title: 'App Info'),
+          _SectionHeader(title: l.appInfo),
           ListTile(
             leading: const Icon(Icons.info_outline),
-            title: const Text('Version'),
+            title: Text(l.version),
             subtitle: Text(AppConfig.appVersion),
           ),
           ListTile(
+            leading: const Icon(Icons.language),
+            title: Text(l.language),
+            subtitle: Text(langProvider.locale.languageCode == 'ro' ? l.romanian : l.english),
+            trailing: SegmentedButton<String>(
+              segments: [
+                ButtonSegment(value: 'en', label: Text(l.english)),
+                ButtonSegment(value: 'ro', label: Text(l.romanian)),
+              ],
+              selected: {langProvider.locale.languageCode},
+              onSelectionChanged: (v) {
+                langProvider.setLocale(Locale(v.first));
+              },
+            ),
+          ),
+          ListTile(
             leading: const Icon(Icons.science_outlined),
-            title: const Text('Mock Services'),
-            subtitle: Text(AppConfig.useMockServices ? 'Enabled' : 'Disabled'),
+            title: Text(l.mockServices),
+            subtitle: Text(AppConfig.useMockServices ? l.enabled : l.disabled),
             trailing: Icon(
               AppConfig.useMockServices ? Icons.check_circle : Icons.cloud,
               color: AppConfig.useMockServices ? Colors.orange : Colors.green,
             ),
           ),
-          const _SectionHeader(title: 'Backend'),
+          _SectionHeader(title: l.backend),
           ListTile(
             leading: const Icon(Icons.dns_outlined),
-            title: const Text('Base URL'),
+            title: Text(l.baseUrl),
             subtitle: Text(AppConfig.baseUrl),
           ),
           ListTile(
@@ -67,17 +89,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     _backendReachable ? Icons.check_circle : Icons.error_outline,
                     color: _backendReachable ? Colors.green : Colors.grey,
                   ),
-            title: const Text('Connection Status'),
-            subtitle: Text(_backendReachable ? 'Connected' : 'Not checked'),
+            title: Text(l.connectionStatus),
+            subtitle: Text(_backendReachable ? l.connected : l.notChecked),
             trailing: TextButton(
               onPressed: _checking ? null : _checkBackend,
-              child: const Text('Test'),
+              child: Text(l.test),
             ),
           ),
-          const _SectionHeader(title: 'Support'),
+          _SectionHeader(title: l.support),
           ListTile(
             leading: const Icon(Icons.feedback_outlined),
-            title: const Text('Send Feedback'),
+            title: Text(l.sendFeedback),
             onTap: () => Navigator.pushNamed(context, '/feedback'),
           ),
         ],

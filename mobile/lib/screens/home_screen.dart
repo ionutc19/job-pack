@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Job Pack'),
+        title: Text(l.appName),
         actions: [
           IconButton(
             icon: const Icon(Icons.settings_outlined),
@@ -21,7 +23,7 @@ class HomeScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'What would you like to do?',
+              l.whatToDo,
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
@@ -29,22 +31,22 @@ class HomeScreen extends StatelessWidget {
             const SizedBox(height: 20),
             _HomeCard(
               icon: Icons.analytics_outlined,
-              title: 'Job Fit Analysis',
-              description: 'Upload your CV and a job description to see how well you match',
+              title: l.jobFitAnalysis,
+              description: l.jobFitDescription,
               color: const Color(0xFF2563EB),
               onTap: () => Navigator.pushNamed(context, '/job-fit'),
             ),
             _HomeCard(
               icon: Icons.person_outline,
-              title: 'Profile Boost',
-              description: 'Improve your LinkedIn headline, about, and experience sections',
+              title: l.profileBoost,
+              description: l.profileBoostDescription,
               color: const Color(0xFF7C3AED),
               onTap: () => Navigator.pushNamed(context, '/profile-boost'),
             ),
             _HomeCard(
               icon: Icons.description_outlined,
-              title: 'Cover Letter',
-              description: 'Generate a personalized cover letter for any job posting',
+              title: l.coverLetter,
+              description: l.coverLetterDescription,
               color: const Color(0xFF059669),
               onTap: () => Navigator.pushNamed(context, '/cover-letter'),
             ),
@@ -53,7 +55,7 @@ class HomeScreen extends StatelessWidget {
               child: TextButton.icon(
                 onPressed: () => Navigator.pushNamed(context, '/feedback'),
                 icon: const Icon(Icons.feedback_outlined, size: 18),
-                label: const Text('Send Feedback'),
+                label: Text(l.sendFeedback),
               ),
             ),
           ],

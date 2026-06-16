@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../config/theme.dart';
+import '../l10n/app_localizations.dart';
 
 class ScoreIndicator extends StatelessWidget {
   final int score;
@@ -19,6 +20,7 @@ class ScoreIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     return SizedBox(
       width: size,
       height: size,
@@ -46,7 +48,7 @@ class ScoreIndicator extends StatelessWidget {
                     ),
               ),
               Text(
-                'Match',
+                l.match,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: Colors.grey,
                     ),
