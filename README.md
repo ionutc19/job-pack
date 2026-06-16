@@ -4,7 +4,7 @@ A mobile-first Android app for job seekers. Analyze job fit, boost your LinkedIn
 
 ## Features
 
-- **Job Fit Analysis** — Upload/paste your CV and a job description to get a match score, missing keywords, and bullet point improvements
+- **Job Fit Analysis** — Paste your CV and a job description to get a match score, missing keywords, and bullet point improvements
 - **Profile Boost** — Improve your LinkedIn headline, About section, and experience descriptions
 - **Apply Letter** — Generate a concise, personalized cover letter based on your CV and the target job
 - **Feedback System** — In-app bug reports and feature requests that create GitHub Issues automatically
@@ -36,8 +36,8 @@ The mobile app uses a service locator pattern that switches between mock and rea
 
 ### Prerequisites
 
-- **Flutter** 3.22+ ([install](https://docs.flutter.dev/get-started/install))
-- **Python** 3.11+ ([install](https://www.python.org/downloads/))
+- **Flutter** 3.22+ ([install](https://docs.flutter.dev/get-started/install)) — tested with 3.44
+- **Python** 3.11+ ([install](https://www.python.org/downloads/)) — tested with 3.11 and 3.14
 - **Android Studio** or an Android emulator
 
 ### Environment Variables
@@ -92,12 +92,18 @@ flutter run
 
 ### With real backend
 
+Start the backend first (`uvicorn app.main:app --reload` in the `server/` directory), then:
+
 ```bash
 cd mobile
-flutter run --dart-define=USE_MOCKS=false --dart-define=BASE_URL=http://10.0.2.2:8000
+flutter run --dart-define=USE_MOCKS=false
 ```
 
-> `10.0.2.2` is the Android emulator's alias for `localhost` on your host machine.
+The app defaults to `http://10.0.2.2:8000`, which is the Android emulator's alias for `localhost` on your host machine. To override:
+
+```bash
+flutter run --dart-define=USE_MOCKS=false --dart-define=BASE_URL=http://your-server:8000
+```
 
 ## Building Android APK Locally
 
@@ -117,7 +123,7 @@ flutter build appbundle --release
 
 The AAB will be at `mobile/build/app/outputs/bundle/release/app-release.aab`.
 
-> Before publishing, you'll need to configure signing in `mobile/android/app/build.gradle` with your upload keystore.
+> Before publishing, you'll need to configure signing in `mobile/android/app/build.gradle.kts` with your upload keystore.
 
 ## Deployment (Single Linux VM)
 
@@ -149,6 +155,28 @@ For the mobile app, build the APK/AAB locally and distribute via Google Play or 
 | POST | `/api/profile-boost/generate` | Generate LinkedIn improvements |
 | POST | `/api/apply-letter/generate` | Generate cover letter |
 | POST | `/api/feedback` | Submit feedback (creates GitHub Issue) |
+
+## Troubleshooting
+
+### Android emulator can't reach the backend
+
+The Android emulator runs in its own network. `localhost` inside the emulator points to the emulator itself, not your dev machine. Use `10.0.2.2` instead — this is the emulator's alias for your host machine's loopback. The app already defaults to `http://10.0.2.2:8000`. If you're running on a physical device, use your machine's local IP (e.g. `192.168.x.x`).
+
+### OneDrive file locking during Flutter/Gradle builds
+
+If your project is inside a OneDrive-synced folder, you may see errors like `Unable to delete directory` during builds. OneDrive locks files while syncing, which conflicts with Gradle's clean tasks. Workarounds:
+
+1. **Pause OneDrive sync** before building (right-click tray icon → Pause syncing)
+2. Run `flutter clean` before `flutter run` if you hit stale lock errors
+3. **Long-term fix**: move the repo to a folder outside OneDrive sync (e.g. `C:\dev\job-pack`)
+
+### Python dependency build errors on Windows
+
+If `pip install` tries to compile `pydantic-core` from source (requires Rust/MSVC), your pydantic version is too old for your Python version. The project uses version ranges (`pydantic>=2.13`) so `pip install -r requirements.txt` should resolve to a version with pre-built wheels. If you still hit issues:
+
+1. Make sure pip is up to date: `python -m pip install --upgrade pip`
+2. Upgrade pydantic explicitly: `pip install --upgrade pydantic pydantic-core`
+3. If using Python 3.14, ensure all deps are at their latest compatible versions
 
 ## Known Next Steps
 

@@ -1,4 +1,3 @@
-from app.config import settings
 from app.models.schemas import (
     ApplyLetterRequest,
     ApplyLetterResponse,
@@ -119,13 +118,3 @@ def generate_cover_letter(request: ApplyLetterRequest) -> ApplyLetterResponse:
             f"Best regards"
         )
     )
-
-
-async def call_ai_provider(prompt: str) -> str:
-    """Placeholder for real AI provider integration.
-
-    When ready, this will use settings.ai_provider, ai_base_url, ai_api_key,
-    ai_model, and ai_timeout_seconds to call the configured AI API.
-    """
-    _ = (settings.ai_provider, settings.ai_base_url, settings.ai_model)
-    return f"[AI response placeholder] Prompt length: {len(prompt)} chars"

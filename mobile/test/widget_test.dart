@@ -34,7 +34,6 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Job Fit Analysis'), findsOneWidget);
-    expect(find.text('Upload CV (PDF or TXT)'), findsOneWidget);
     expect(find.text('Analyze Match'), findsOneWidget);
   });
 
