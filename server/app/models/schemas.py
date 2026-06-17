@@ -1,9 +1,21 @@
 from pydantic import BaseModel, Field
 
 
+class UsageMeta(BaseModel):
+    tier: str = "free"
+    used: int = 0
+    remaining: int = 5
+    period_seconds: int = 2592000
+    show_upgrade: bool = True
+
+
 class JobFitRequest(BaseModel):
-    cv_text: str = Field(..., min_length=10, description="CV/resume content")
-    job_description: str = Field(..., min_length=10, description="Job posting text")
+    cv_text: str = Field(
+        ..., min_length=10, description="CV/resume content",
+    )
+    job_description: str = Field(
+        ..., min_length=10, description="Job posting text",
+    )
     language: str = Field(default="en", pattern="^(en|ro)$")
 
 
@@ -22,6 +34,7 @@ class JobFitResponse(BaseModel):
     summary: str
     missing_keywords: list[KeywordGap]
     bullet_suggestions: list[BulletSuggestion]
+    usage: UsageMeta | None = None
 
 
 class ProfileBoostRequest(BaseModel):
@@ -36,21 +49,28 @@ class ProfileBoostResponse(BaseModel):
     improved_about: str
     improved_experience: str
     tips: list[str]
+    usage: UsageMeta | None = None
 
 
 class ApplyLetterRequest(BaseModel):
     cv_text: str = Field(..., min_length=10)
     job_description: str = Field(..., min_length=10)
-    tone: str = Field(default="professional", pattern="^(professional|casual|enthusiastic)$")
+    tone: str = Field(
+        default="professional",
+        pattern="^(professional|casual|enthusiastic)$",
+    )
     language: str = Field(default="en", pattern="^(en|ro)$")
 
 
 class ApplyLetterResponse(BaseModel):
     cover_letter: str
+    usage: UsageMeta | None = None
 
 
 class FeedbackRequest(BaseModel):
-    category: str = Field(..., pattern="^(bug|feature|feedback)$")
+    category: str = Field(
+        ..., pattern="^(bug|feature|feedback)$",
+    )
     title: str = Field(..., min_length=3, max_length=200)
     description: str = Field(..., min_length=10)
     email: str = ""
@@ -65,3 +85,12 @@ class FeedbackResponse(BaseModel):
 class HealthResponse(BaseModel):
     status: str
     version: str
+
+
+class UserTierRequest(BaseModel):
+    tier: str = Field(pattern="^(free|premium|pro)$")
+
+
+class UserTierResponse(BaseModel):
+    tier: str
+    usage: dict[str, UsageMeta]

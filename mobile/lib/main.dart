@@ -11,6 +11,8 @@ import 'screens/profile_boost_screen.dart';
 import 'screens/cover_letter_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/feedback_screen.dart';
+import 'screens/plans_screen.dart';
+import 'screens/privacy_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -51,6 +53,8 @@ class JobCoachApp extends StatelessWidget {
               '/cover-letter': (_) => const CoverLetterScreen(),
               '/settings': (_) => const SettingsScreen(),
               '/feedback': (_) => const FeedbackScreen(),
+              '/plans': (_) => const PlansScreen(),
+              '/privacy': (_) => const PrivacyScreen(),
             },
           );
         },

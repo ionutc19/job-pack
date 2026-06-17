@@ -1,7 +1,14 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers import apply_letter, feedback, health, job_fit, profile_boost
+from app.routers import (
+    apply_letter,
+    entitlements,
+    feedback,
+    health,
+    job_fit,
+    profile_boost,
+)
 
 app = FastAPI(
     title="Job Coach API",
@@ -25,3 +32,4 @@ app.include_router(job_fit.router)
 app.include_router(profile_boost.router)
 app.include_router(apply_letter.router)
 app.include_router(feedback.router)
+app.include_router(entitlements.router)

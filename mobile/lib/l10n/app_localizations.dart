@@ -105,6 +105,7 @@ class AppLocalizations {
   String get backendReachable => get('backendReachable');
   String get backendNotReachable => get('backendNotReachable');
   String get support => get('support');
+  String get account => get('account');
 
   // Feedback
   String get feedbackInstructions => get('feedbackInstructions');
@@ -127,6 +128,47 @@ class AppLocalizations {
   // Loading
   String get processing => get('processing');
   String get error => get('error');
+
+  // Plans
+  String get plans => get('plans');
+  String get choosePlan => get('choosePlan');
+  String get plansSubtitle => get('plansSubtitle');
+  String get currentPlan => get('currentPlan');
+  String get planFree => get('planFree');
+  String get planFreePrice => get('planFreePrice');
+  String get planFreeAds => get('planFreeAds');
+  String get planFreeRequests => get('planFreeRequests');
+  String get planFreeModules => get('planFreeModules');
+  String get planPremium => get('planPremium');
+  String get planPremiumPrice => get('planPremiumPrice');
+  String get planPremiumNoAds => get('planPremiumNoAds');
+  String get planPremiumRequests => get('planPremiumRequests');
+  String get planPremiumModules => get('planPremiumModules');
+  String get planPro => get('planPro');
+  String get planProPrice => get('planProPrice');
+  String get planProNoAds => get('planProNoAds');
+  String get planProRequests => get('planProRequests');
+  String get planProModules => get('planProModules');
+  String get planProFairUse => get('planProFairUse');
+  String upgradeTo(String plan) => get('upgradeTo').replaceAll('{plan}', plan);
+  String get billingNote => get('billingNote');
+  String get billingComingSoon => get('billingComingSoon');
+
+  // Privacy
+  String get privacyTitle => get('privacyTitle');
+  String get privacyDataProcessing => get('privacyDataProcessing');
+  String get privacyDataProcessingBody => get('privacyDataProcessingBody');
+  String get privacyAiUsage => get('privacyAiUsage');
+  String get privacyAiUsageBody => get('privacyAiUsageBody');
+  String get privacyDataStorage => get('privacyDataStorage');
+  String get privacyDataStorageBody => get('privacyDataStorageBody');
+  String get privacySubscriptions => get('privacySubscriptions');
+  String get privacySubscriptionsBody => get('privacySubscriptionsBody');
+  String get privacyThirdParty => get('privacyThirdParty');
+  String get privacyThirdPartyBody => get('privacyThirdPartyBody');
+  String get privacyContact => get('privacyContact');
+  String get privacyContactBody => get('privacyContactBody');
+  String get privacyLastUpdated => get('privacyLastUpdated');
 
   static const Map<String, String> _en = {
     'appName': 'Job Coach',
@@ -201,6 +243,7 @@ class AppLocalizations {
     'backendReachable': 'Backend is reachable',
     'backendNotReachable': 'Backend is not reachable',
     'support': 'Support',
+    'account': 'Account',
 
     'feedbackInstructions': 'Help us improve Job Coach. Report bugs, request features, or share feedback.',
     'category': 'Category',
@@ -221,6 +264,47 @@ class AppLocalizations {
 
     'processing': 'Processing...',
     'error': 'Error',
+
+    // Plans
+    'plans': 'Plans',
+    'choosePlan': 'Choose Your Plan',
+    'plansSubtitle': 'Select the plan that fits your job search needs.',
+    'currentPlan': 'Current',
+    'planFree': 'Free',
+    'planFreePrice': '\$0 / month',
+    'planFreeAds': 'Ads enabled',
+    'planFreeRequests': '5 requests per month per module',
+    'planFreeModules': 'All 3 modules included',
+    'planPremium': 'Premium',
+    'planPremiumPrice': '\$3.99 / month',
+    'planPremiumNoAds': 'No ads',
+    'planPremiumRequests': '20 requests per day per module',
+    'planPremiumModules': 'All 3 modules included',
+    'planPro': 'Pro',
+    'planProPrice': '\$9.99 / month',
+    'planProNoAds': 'No ads',
+    'planProRequests': 'Unlimited access',
+    'planProModules': 'All 3 modules included',
+    'planProFairUse': 'Fair use policy applies',
+    'upgradeTo': 'Upgrade to {plan}',
+    'billingNote': 'Billing integration coming soon. Plans shown for preview.',
+    'billingComingSoon': 'Billing is not yet available. Coming soon!',
+
+    // Privacy
+    'privacyTitle': 'Privacy & Legal',
+    'privacyDataProcessing': 'Data Processing',
+    'privacyDataProcessingBody': 'When you use Job Coach, your input (CV text, job descriptions, LinkedIn profile sections) is sent to our backend server for processing. This data is transmitted securely and used solely to generate your requested analysis, profile improvements, or cover letter.',
+    'privacyAiUsage': 'AI-Powered Results',
+    'privacyAiUsageBody': 'Job Coach uses artificial intelligence models hosted on Microsoft Azure to generate results. Your input is forwarded to the AI model as part of the request. The AI processes your data in real time and does not retain it after generating a response.',
+    'privacyDataStorage': 'Data Storage',
+    'privacyDataStorageBody': 'Job Coach does not permanently store your CV text, job descriptions, or generated results on our servers. Input data is processed in memory and discarded after the response is delivered. Your language preference is stored locally on your device.',
+    'privacySubscriptions': 'Subscriptions & Entitlements',
+    'privacySubscriptionsBody': 'If you subscribe to a paid plan, your subscription status and usage data (request counts, tier information) may be processed and stored to enforce plan limits. Payment processing is handled by third-party billing providers.',
+    'privacyThirdParty': 'Third-Party Services & Advertising',
+    'privacyThirdPartyBody': 'In the future, the free tier may include advertisements served by third-party ad networks. These services may collect device identifiers and usage data according to their own privacy policies. We will update this section when advertising is enabled.',
+    'privacyContact': 'Contact',
+    'privacyContactBody': 'If you have questions about how your data is handled, please use the Send Feedback feature in the app or contact us through the app settings.',
+    'privacyLastUpdated': 'Last updated: June 2026',
   };
 
   static const Map<String, String> _ro = {
@@ -296,6 +380,7 @@ class AppLocalizations {
     'backendReachable': 'Backend-ul este accesibil',
     'backendNotReachable': 'Backend-ul nu este accesibil',
     'support': 'Suport',
+    'account': 'Cont',
 
     'feedbackInstructions': 'Ajută-ne să îmbunătățim Job Coach. Raportează erori, solicită funcționalități sau trimite feedback.',
     'category': 'Categorie',
@@ -316,6 +401,47 @@ class AppLocalizations {
 
     'processing': 'Se procesează...',
     'error': 'Eroare',
+
+    // Plans
+    'plans': 'Planuri',
+    'choosePlan': 'Alege Planul Tău',
+    'plansSubtitle': 'Selectează planul potrivit pentru căutarea ta de job.',
+    'currentPlan': 'Curent',
+    'planFree': 'Gratuit',
+    'planFreePrice': '\$0 / lună',
+    'planFreeAds': 'Reclame activate',
+    'planFreeRequests': '5 cereri pe lună per modul',
+    'planFreeModules': 'Toate cele 3 module incluse',
+    'planPremium': 'Premium',
+    'planPremiumPrice': '\$3,99 / lună',
+    'planPremiumNoAds': 'Fără reclame',
+    'planPremiumRequests': '20 cereri pe zi per modul',
+    'planPremiumModules': 'Toate cele 3 module incluse',
+    'planPro': 'Pro',
+    'planProPrice': '\$9,99 / lună',
+    'planProNoAds': 'Fără reclame',
+    'planProRequests': 'Acces nelimitat',
+    'planProModules': 'Toate cele 3 module incluse',
+    'planProFairUse': 'Se aplică politica de utilizare corectă',
+    'upgradeTo': 'Treci la {plan}',
+    'billingNote': 'Integrarea facturării vine în curând. Planurile sunt afișate pentru previzualizare.',
+    'billingComingSoon': 'Facturarea nu este încă disponibilă. În curând!',
+
+    // Privacy
+    'privacyTitle': 'Confidențialitate și Legal',
+    'privacyDataProcessing': 'Procesarea Datelor',
+    'privacyDataProcessingBody': 'Când folosești Job Coach, datele introduse (text CV, descrieri de job, secțiuni de profil LinkedIn) sunt trimise către serverul nostru pentru procesare. Aceste date sunt transmise securizat și utilizate exclusiv pentru a genera analiza, îmbunătățirile de profil sau scrisoarea de intenție solicitată.',
+    'privacyAiUsage': 'Rezultate Generate de AI',
+    'privacyAiUsageBody': 'Job Coach folosește modele de inteligență artificială găzduite pe Microsoft Azure pentru a genera rezultate. Datele introduse sunt transmise modelului AI ca parte a cererii. AI-ul procesează datele în timp real și nu le reține după generarea răspunsului.',
+    'privacyDataStorage': 'Stocarea Datelor',
+    'privacyDataStorageBody': 'Job Coach nu stochează permanent textul CV-ului, descrierile de job sau rezultatele generate pe serverele noastre. Datele introduse sunt procesate în memorie și eliminate după livrarea răspunsului. Preferința de limbă este stocată local pe dispozitivul tău.',
+    'privacySubscriptions': 'Abonamente și Drepturi',
+    'privacySubscriptionsBody': 'Dacă te abonezi la un plan plătit, statusul abonamentului și datele de utilizare (număr de cereri, informații despre plan) pot fi procesate și stocate pentru aplicarea limitelor planului. Procesarea plăților este gestionată de furnizori terți de facturare.',
+    'privacyThirdParty': 'Servicii Terțe și Publicitate',
+    'privacyThirdPartyBody': 'În viitor, planul gratuit poate include reclame difuzate de rețele publicitare terțe. Aceste servicii pot colecta identificatori de dispozitiv și date de utilizare conform propriilor politici de confidențialitate. Vom actualiza această secțiune când publicitatea va fi activată.',
+    'privacyContact': 'Contact',
+    'privacyContactBody': 'Dacă ai întrebări despre modul în care sunt gestionate datele tale, te rugăm să folosești funcția Trimite Feedback din aplicație sau să ne contactezi prin setările aplicației.',
+    'privacyLastUpdated': 'Ultima actualizare: iunie 2026',
   };
 }
 

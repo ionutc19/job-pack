@@ -165,3 +165,74 @@ def test_feedback_categories(category: str):
         },
     )
     assert response.status_code == 200
+
+
+def test_usage_meta_in_job_fit():
+    response = client.post(
+        "/api/job-fit/analyze",
+        json={
+            "cv_text": "Experienced python developer with django expertise",
+            "job_description": "Looking for a python developer with react experience",
+        },
+        headers={"X-Device-Id": "test-usage-jf"},
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert "usage" in data
+    assert data["usage"]["tier"] == "free"
+    assert data["usage"]["remaining"] >= 0
+    assert "show_upgrade" in data["usage"]
+
+
+def test_entitlements_me():
+    response = client.get(
+        "/api/entitlements/me",
+        headers={"X-Device-Id": "test-ent-me"},
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["tier"] == "free"
+    assert "job_fit" in data["usage"]
+    assert "profile_boost" in data["usage"]
+    assert "cover_letter" in data["usage"]
+
+
+def test_entitlements_upgrade():
+    response = client.post(
+        "/api/entitlements/tier",
+        json={"tier": "premium"},
+        headers={"X-Device-Id": "test-ent-upgrade"},
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["tier"] == "premium"
+
+    response = client.get(
+        "/api/entitlements/me",
+        headers={"X-Device-Id": "test-ent-upgrade"},
+    )
+    assert response.json()["tier"] == "premium"
+
+
+def test_free_tier_limit():
+    device = "test-free-limit"
+    for i in range(5):
+        response = client.post(
+            "/api/job-fit/analyze",
+            json={
+                "cv_text": "Experienced python developer with django expertise",
+                "job_description": "Looking for a python developer with react",
+            },
+            headers={"X-Device-Id": device},
+        )
+        assert response.status_code == 200
+
+    response = client.post(
+        "/api/job-fit/analyze",
+        json={
+            "cv_text": "Experienced python developer with django expertise",
+            "job_description": "Looking for a python developer with react",
+        },
+        headers={"X-Device-Id": device},
+    )
+    assert response.status_code == 429
