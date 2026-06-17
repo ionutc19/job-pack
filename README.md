@@ -150,13 +150,9 @@ The AAB will be at `mobile/build/app/outputs/bundle/release/app-release.aab`.
 1. Create a Python 3.11 Linux App Service
 2. Set environment variables in App Service Configuration (all from `.env.example`)
 3. Deploy the `server/` directory (via GitHub Actions, ZIP deploy, or local Git)
-4. Set the startup command:
+4. Set the startup command (must use `bash` so Azure doesn't fall back to sync workers):
    ```
-   startup.sh
-   ```
-   Or directly:
-   ```
-   gunicorn app.main:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
+   bash startup.sh
    ```
 5. The app will be available at `https://your-app.azurewebsites.net`
 

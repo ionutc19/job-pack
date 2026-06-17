@@ -3,6 +3,8 @@ set -eu
 
 cd /home/site/wwwroot
 
+pip install -r requirements.txt --quiet
+
 echo "[startup] Running database migrations..."
 alembic upgrade head
 
