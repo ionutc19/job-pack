@@ -1,14 +1,10 @@
-#!/bin/bash
-set -e
-# Azure App Service startup script
-# Set as: az webapp config set --startup-file "startup.sh"
+#!/bin/sh
+set -eu
 
-echo "Running Alembic migrations..."
+cd /home/site/wwwroot
+
+echo "[startup] Running database migrations..."
 alembic upgrade head
-echo "Migrations complete."
 
-exec gunicorn app.main:app \
-  --workers 4 \
-  --worker-class uvicorn.workers.UvicornWorker \
-  --bind 0.0.0.0:8000 \
-  --timeout 120
+echo "[startup] Starting FastAPI with Gunicorn + UvicornWorker..."
+exec gunicorn -w 2 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:8000 app.main:app
