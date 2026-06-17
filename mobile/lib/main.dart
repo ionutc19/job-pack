@@ -13,11 +13,13 @@ import 'screens/settings_screen.dart';
 import 'screens/feedback_screen.dart';
 import 'screens/plans_screen.dart';
 import 'screens/privacy_screen.dart';
+import 'services/user_identity.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final languageProvider = LanguageProvider();
   await languageProvider.load();
+  await UserIdentity().load();
   runApp(JobCoachApp(languageProvider: languageProvider));
 }
 

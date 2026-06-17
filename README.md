@@ -61,6 +61,11 @@ cp server/.env.example server/.env
 | `GITHUB_TOKEN` | GitHub PAT for creating issues | Yes (for feedback) |
 | `GITHUB_REPO_OWNER` | GitHub repo owner | No (default: ionutc19) |
 | `GITHUB_REPO_NAME` | GitHub repo name | No (default: job-pack) |
+| `DATABASE_URL` | SQLite path (e.g. `sqlite:///data/jobcoach.db`) | No (default: `sqlite:///data/jobcoach.db`) |
+| `ADMIN_SECRET` | Secret for admin/debug endpoints | No (admin endpoints disabled without it) |
+| `GOOGLE_PLAY_PACKAGE` | Android package name | No (default: `com.ionutc19.jobcoach`) |
+| `GOOGLE_PLAY_CREDENTIALS_JSON` | Google Play service account JSON path | No (purchase verification disabled without it) |
+| `RTDN_SECRET` | Shared secret for RTDN webhook | No |
 
 ## Running the Backend
 
@@ -190,6 +195,27 @@ For the mobile app, build the APK/AAB locally and distribute via Google Play or 
 | POST | `/api/profile-boost/generate` | Generate LinkedIn improvements (accepts `language`: en/ro) |
 | POST | `/api/apply-letter/generate` | Generate cover letter (accepts `language`: en/ro) |
 | POST | `/api/feedback` | Submit feedback (creates GitHub Issue) |
+| GET | `/api/entitlements/me` | Get current tier and usage for user |
+| POST | `/api/entitlements/verify-purchase` | Submit a Google Play purchase for verification |
+| POST | `/api/admin/set-tier` | Admin-only: override user tier (requires `X-Admin-Secret`) |
+| POST | `/api/admin/rtdn` | RTDN webhook endpoint for Google Play notifications |
+
+All content endpoints (`job-fit`, `profile-boost`, `apply-letter`) accept `X-User-Id` and `X-Device-Id` headers for identity. Responses include `usage` metadata (tier, used, remaining, period).
+
+## Entitlements & Persistence
+
+Entitlements, usage counters, and subscription data are stored in a SQLite database (`data/jobcoach.db` by default). The schema is designed to be PostgreSQL-compatible for production migration. The database is auto-created on first startup.
+
+**Privacy**: CV text, job descriptions, and generated results are NOT stored in the database. Only user identity, tier, subscription metadata, and usage event timestamps are persisted.
+
+**User identity**: The mobile app generates a stable UUID on first launch and sends it as `X-User-Id` on all requests. `X-Device-Id` is a secondary anti-abuse signal. There is no account/login system yet.
+
+**Tier management**: The public `POST /api/entitlements/tier` endpoint has been removed. Tier changes happen through:
+- Purchase verification (`POST /api/entitlements/verify-purchase`)
+- RTDN webhook processing (`POST /api/admin/rtdn`)
+- Admin override (`POST /api/admin/set-tier`, requires `ADMIN_SECRET`)
+
+**Google Play integration**: The subscription service is scaffolded for `jobcoach_premium_monthly` and `jobcoach_pro_monthly` product IDs. Purchase verification and RTDN handling require `GOOGLE_PLAY_CREDENTIALS_JSON` to be configured with a service account that has access to the Google Play Developer API.
 
 ## Troubleshooting
 
@@ -216,8 +242,14 @@ If `pip install` tries to compile `pydantic-core` from source (requires Rust/MSV
 ## Known Next Steps
 
 - [x] Integrate real AI provider via Azure OpenAI `/responses` API
+- [x] Persistent entitlements + usage tracking (SQLite)
+- [x] Stable user identity (UUID-based)
+- [x] Subscription-ready architecture (Google Play product IDs, verification, RTDN)
+- [ ] Configure Google Play service account and activate purchase verification
+- [ ] Integrate Google Play Billing Library in Flutter app
+- [ ] Add AdMob SDK for free tier
 - [ ] Add PDF text extraction for CV uploads
-- [ ] Add authentication / rate limiting
+- [ ] Migrate SQLite to PostgreSQL for production
 - [ ] Add dark theme support
 - [ ] Add local storage for saving past analyses
 - [ ] Add share functionality for cover letters

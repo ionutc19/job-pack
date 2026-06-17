@@ -4,6 +4,7 @@ import '../config/app_config.dart';
 import '../l10n/app_localizations.dart';
 import '../l10n/language_provider.dart';
 import '../services/service_locator.dart';
+import '../services/user_identity.dart';
 import '../widgets/language_dropdown.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -16,6 +17,26 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   bool _backendReachable = false;
   bool _checking = false;
+  String _currentTier = 'free';
+
+  @override
+  void initState() {
+    super.initState();
+    if (!AppConfig.useMockServices) {
+      _fetchTier();
+    }
+  }
+
+  Future<void> _fetchTier() async {
+    try {
+      final data = await ServiceLocator().api.getEntitlements();
+      if (mounted) {
+        setState(() {
+          _currentTier = data['tier'] as String? ?? 'free';
+        });
+      }
+    } catch (_) {}
+  }
 
   Future<void> _checkBackend() async {
     setState(() => _checking = true);
@@ -34,10 +55,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
+  String _tierLabel(AppLocalizations l) {
+    switch (_currentTier) {
+      case 'premium':
+        return l.planPremium;
+      case 'pro':
+        return l.planPro;
+      default:
+        return l.planFree;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final langProvider = Provider.of<LanguageProvider>(context);
+    final userId = UserIdentity().userId;
 
     return Scaffold(
       appBar: AppBar(title: Text(l.settings)),
@@ -64,6 +97,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
               color: AppConfig.useMockServices ? Colors.orange : Colors.green,
             ),
           ),
+          _SectionHeader(title: l.account),
+          ListTile(
+            leading: const Icon(Icons.workspace_premium_outlined),
+            title: Text(l.plans),
+            subtitle: Text(_tierLabel(l)),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => Navigator.pushNamed(context, '/plans'),
+          ),
+          ListTile(
+            leading: const Icon(Icons.fingerprint),
+            title: Text(l.userId),
+            subtitle: Text(
+              userId.length > 8 ? '${userId.substring(0, 8)}...' : userId,
+              style: TextStyle(
+                fontFamily: 'monospace',
+                color: Colors.grey.shade600,
+              ),
+            ),
+          ),
           _SectionHeader(title: l.backend),
           ListTile(
             leading: const Icon(Icons.dns_outlined),
@@ -87,14 +139,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               onPressed: _checking ? null : _checkBackend,
               child: Text(l.test),
             ),
-          ),
-          _SectionHeader(title: l.account),
-          ListTile(
-            leading: const Icon(Icons.workspace_premium_outlined),
-            title: Text(l.plans),
-            subtitle: Text(l.planFree),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () => Navigator.pushNamed(context, '/plans'),
           ),
           _SectionHeader(title: l.support),
           ListTile(

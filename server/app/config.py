@@ -12,6 +12,14 @@ class Settings(BaseSettings):
     github_repo_owner: str = "ionutc19"
     github_repo_name: str = "job-pack"
 
+    database_url: str = "sqlite:///data/jobcoach.db"
+
+    google_play_package: str = "com.ionutc19.jobcoach"
+    google_play_credentials_json: str = ""
+    rtdn_secret: str = ""
+
+    admin_secret: str = ""
+
     host: str = "0.0.0.0"
     port: int = 8000
 

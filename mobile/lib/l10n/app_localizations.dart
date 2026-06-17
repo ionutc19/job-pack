@@ -106,6 +106,7 @@ class AppLocalizations {
   String get backendNotReachable => get('backendNotReachable');
   String get support => get('support');
   String get account => get('account');
+  String get userId => get('userId');
 
   // Feedback
   String get feedbackInstructions => get('feedbackInstructions');
@@ -244,6 +245,7 @@ class AppLocalizations {
     'backendNotReachable': 'Backend is not reachable',
     'support': 'Support',
     'account': 'Account',
+    'userId': 'User ID',
 
     'feedbackInstructions': 'Help us improve Job Coach. Report bugs, request features, or share feedback.',
     'category': 'Category',
@@ -297,7 +299,7 @@ class AppLocalizations {
     'privacyAiUsage': 'AI-Powered Results',
     'privacyAiUsageBody': 'Job Coach uses artificial intelligence models hosted on Microsoft Azure to generate results. Your input is forwarded to the AI model as part of the request. The AI processes your data in real time and does not retain it after generating a response.',
     'privacyDataStorage': 'Data Storage',
-    'privacyDataStorageBody': 'Job Coach does not permanently store your CV text, job descriptions, or generated results on our servers. Input data is processed in memory and discarded after the response is delivered. Your language preference is stored locally on your device.',
+    'privacyDataStorageBody': 'Job Coach does not permanently store your CV text, job descriptions, or generated results on our servers. Input data is processed in memory and discarded after the response is delivered. Your language preference and a stable app user ID are stored locally on your device. Usage counters, subscription status, and entitlement data are stored on the server to enforce plan limits.',
     'privacySubscriptions': 'Subscriptions & Entitlements',
     'privacySubscriptionsBody': 'If you subscribe to a paid plan, your subscription status and usage data (request counts, tier information) may be processed and stored to enforce plan limits. Payment processing is handled by third-party billing providers.',
     'privacyThirdParty': 'Third-Party Services & Advertising',
@@ -381,6 +383,7 @@ class AppLocalizations {
     'backendNotReachable': 'Backend-ul nu este accesibil',
     'support': 'Suport',
     'account': 'Cont',
+    'userId': 'ID Utilizator',
 
     'feedbackInstructions': 'Ajută-ne să îmbunătățim Job Coach. Raportează erori, solicită funcționalități sau trimite feedback.',
     'category': 'Categorie',
@@ -434,7 +437,7 @@ class AppLocalizations {
     'privacyAiUsage': 'Rezultate Generate de AI',
     'privacyAiUsageBody': 'Job Coach folosește modele de inteligență artificială găzduite pe Microsoft Azure pentru a genera rezultate. Datele introduse sunt transmise modelului AI ca parte a cererii. AI-ul procesează datele în timp real și nu le reține după generarea răspunsului.',
     'privacyDataStorage': 'Stocarea Datelor',
-    'privacyDataStorageBody': 'Job Coach nu stochează permanent textul CV-ului, descrierile de job sau rezultatele generate pe serverele noastre. Datele introduse sunt procesate în memorie și eliminate după livrarea răspunsului. Preferința de limbă este stocată local pe dispozitivul tău.',
+    'privacyDataStorageBody': 'Job Coach nu stochează permanent textul CV-ului, descrierile de job sau rezultatele generate pe serverele noastre. Datele introduse sunt procesate în memorie și eliminate după livrarea răspunsului. Preferința de limbă și un ID stabil de utilizator sunt stocate local pe dispozitivul tău. Contoarele de utilizare, statusul abonamentului și datele de drepturi sunt stocate pe server pentru aplicarea limitelor planului.',
     'privacySubscriptions': 'Abonamente și Drepturi',
     'privacySubscriptionsBody': 'Dacă te abonezi la un plan plătit, statusul abonamentului și datele de utilizare (număr de cereri, informații despre plan) pot fi procesate și stocate pentru aplicarea limitelor planului. Procesarea plăților este gestionată de furnizori terți de facturare.',
     'privacyThirdParty': 'Servicii Terțe și Publicitate',

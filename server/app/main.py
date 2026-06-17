@@ -1,7 +1,11 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.db import init_db
 from app.routers import (
+    admin,
     apply_letter,
     entitlements,
     feedback,
@@ -10,13 +14,22 @@ from app.routers import (
     profile_boost,
 )
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    init_db()
+    yield
+
+
 app = FastAPI(
     title="Job Coach API",
     description=(
         "Backend for the Job Coach mobile app — "
-        "job fit analysis, profile boost, and cover letter generation."
+        "job fit analysis, profile boost, "
+        "and cover letter generation."
     ),
-    version="0.1.0",
+    version="0.2.0",
+    lifespan=lifespan,
 )
 
 app.add_middleware(
@@ -33,3 +46,4 @@ app.include_router(profile_boost.router)
 app.include_router(apply_letter.router)
 app.include_router(feedback.router)
 app.include_router(entitlements.router)
+app.include_router(admin.router)

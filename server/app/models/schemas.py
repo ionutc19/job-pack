@@ -94,3 +94,27 @@ class UserTierRequest(BaseModel):
 class UserTierResponse(BaseModel):
     tier: str
     usage: dict[str, UsageMeta]
+    subscription: dict | None = None
+
+
+class VerifyPurchaseRequest(BaseModel):
+    product_id: str = Field(
+        ...,
+        pattern=(
+            "^(jobcoach_premium_monthly"
+            "|jobcoach_pro_monthly)$"
+        ),
+    )
+    purchase_token: str = Field(..., min_length=1)
+
+
+class VerifyPurchaseResponse(BaseModel):
+    valid: bool
+    tier: str = "free"
+    error: str = ""
+    message: str = ""
+
+
+class RtdnNotification(BaseModel):
+    message: dict
+    subscription: str = ""

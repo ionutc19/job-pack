@@ -1,8 +1,41 @@
 import 'package:flutter/material.dart';
+import '../config/app_config.dart';
 import '../l10n/app_localizations.dart';
+import '../services/service_locator.dart';
 
-class PlansScreen extends StatelessWidget {
+class PlansScreen extends StatefulWidget {
   const PlansScreen({super.key});
+
+  @override
+  State<PlansScreen> createState() => _PlansScreenState();
+}
+
+class _PlansScreenState extends State<PlansScreen> {
+  String _currentTier = 'free';
+  bool _loading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (!AppConfig.useMockServices) {
+      _fetchTier();
+    }
+  }
+
+  Future<void> _fetchTier() async {
+    setState(() => _loading = true);
+    try {
+      final data = await ServiceLocator().api.getEntitlements();
+      if (mounted) {
+        setState(() {
+          _currentTier = data['tier'] as String? ?? 'free';
+          _loading = false;
+        });
+      }
+    } catch (_) {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,8 +68,9 @@ class PlansScreen extends StatelessWidget {
               _Feature(l.planFreeRequests, true),
               _Feature(l.planFreeModules, true),
             ],
-            isCurrent: true,
+            isCurrent: _currentTier == 'free',
             currentLabel: l.currentPlan,
+            loading: _loading,
           ),
           const SizedBox(height: 16),
           _PlanCard(
@@ -48,8 +82,10 @@ class PlansScreen extends StatelessWidget {
               _Feature(l.planPremiumRequests, true),
               _Feature(l.planPremiumModules, true),
             ],
-            isCurrent: false,
-            actionLabel: l.upgradeTo(l.planPremium),
+            isCurrent: _currentTier == 'premium',
+            currentLabel: l.currentPlan,
+            actionLabel: _currentTier == 'premium' ? null : l.upgradeTo(l.planPremium),
+            loading: _loading,
           ),
           const SizedBox(height: 16),
           _PlanCard(
@@ -62,8 +98,10 @@ class PlansScreen extends StatelessWidget {
               _Feature(l.planProModules, true),
               _Feature(l.planProFairUse, true),
             ],
-            isCurrent: false,
-            actionLabel: l.upgradeTo(l.planPro),
+            isCurrent: _currentTier == 'pro',
+            currentLabel: l.currentPlan,
+            actionLabel: _currentTier == 'pro' ? null : l.upgradeTo(l.planPro),
+            loading: _loading,
           ),
           const SizedBox(height: 24),
           Text(
@@ -93,6 +131,7 @@ class _PlanCard extends StatelessWidget {
   final bool isCurrent;
   final String? currentLabel;
   final String? actionLabel;
+  final bool loading;
 
   const _PlanCard({
     required this.title,
@@ -102,6 +141,7 @@ class _PlanCard extends StatelessWidget {
     required this.isCurrent,
     this.currentLabel,
     this.actionLabel,
+    this.loading = false,
   });
 
   @override
@@ -128,7 +168,7 @@ class _PlanCard extends StatelessWidget {
                       ),
                 ),
                 const Spacer(),
-                if (isCurrent && currentLabel != null)
+                if (isCurrent && currentLabel != null && !loading)
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 12,
