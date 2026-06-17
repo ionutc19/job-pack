@@ -15,6 +15,9 @@ def on_starting(server):
         capture_output=True, text=True,
     )
     if result.returncode != 0:
-        server.log.error("Migration failed:\n%s", result.stderr)
-        sys.exit(1)
-    server.log.info("Migrations complete.")
+        server.log.warning(
+            "Migration failed (app will start anyway):\n%s",
+            result.stderr,
+        )
+    else:
+        server.log.info("Migrations complete.")
