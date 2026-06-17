@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     github_repo_owner: str = "ionutc19"
     github_repo_name: str = "job-pack"
 
-    database_url: str = "sqlite:///data/jobcoach.db"
+    database_url: str = "postgresql+psycopg2://jobcoachadmin@jobcoach-pg-ionut.postgres.database.azure.com:5432/jobcoach?sslmode=require"
 
     google_play_package: str = "com.ionutc19.jobcoach"
     google_play_credentials_json: str = ""

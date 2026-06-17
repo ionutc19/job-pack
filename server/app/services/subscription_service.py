@@ -1,8 +1,10 @@
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
+
+from sqlalchemy import and_
 
 from app.config import settings
-from app.db import get_conn
+from app.db import Subscription, User, get_session
 from app.models.entitlements import Tier
 
 logger = logging.getLogger(__name__)
@@ -50,13 +52,6 @@ async def verify_purchase(
             ),
         }
 
-    # TODO: Call Google Play Developer API to verify
-    # subscription_response = await _call_play_api(
-    #     package_name=settings.google_play_package,
-    #     subscription_id=product_id,
-    #     token=purchase_token,
-    # )
-    # For now, log and store as pending:
     logger.info(
         "Would verify purchase: product=%s token=%s...",
         product_id, purchase_token[:20],
@@ -86,43 +81,45 @@ def _store_subscription(
     purchase_token: str,
     status: str,
     tier: Tier,
-    expires_at: str | None = None,
+    expires_at: datetime | None = None,
 ) -> None:
-    conn = get_conn()
-    existing = conn.execute(
-        "SELECT id FROM subscriptions "
-        "WHERE user_id = ? AND product_id = ? "
-        "AND purchase_token = ?",
-        (user_id, product_id, purchase_token),
-    ).fetchone()
-
-    now = datetime.utcnow().isoformat()
-
-    if existing:
-        conn.execute(
-            "UPDATE subscriptions SET status = ?, "
-            "expires_at = ?, updated_at = ? WHERE id = ?",
-            (status, expires_at, now, existing["id"]),
-        )
-    else:
-        conn.execute(
-            "INSERT INTO subscriptions "
-            "(user_id, product_id, purchase_token, "
-            "status, tier, started_at, expires_at) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?)",
-            (
-                user_id, product_id, purchase_token,
-                status, tier.value, now, expires_at,
+    session = get_session()
+    try:
+        existing = session.query(Subscription).filter(
+            and_(
+                Subscription.user_id == user_id,
+                Subscription.product_id == product_id,
+                Subscription.purchase_token == purchase_token,
             ),
-        )
-    conn.commit()
+        ).first()
+
+        now = datetime.now(timezone.utc)
+
+        if existing:
+            existing.status = status
+            existing.expires_at = expires_at
+            existing.updated_at = now
+        else:
+            sub = Subscription(
+                user_id=user_id,
+                product_id=product_id,
+                purchase_token=purchase_token,
+                status=status,
+                tier=tier.value,
+                started_at=now,
+                expires_at=expires_at,
+            )
+            session.add(sub)
+        session.commit()
+    finally:
+        session.close()
 
 
 def activate_subscription(
     user_id: str,
     product_id: str,
     purchase_token: str,
-    expires_at: str | None = None,
+    expires_at: datetime | None = None,
 ) -> Tier:
     tier = PRODUCT_TIER_MAP.get(product_id, Tier.FREE)
 
@@ -135,13 +132,14 @@ def activate_subscription(
         expires_at=expires_at,
     )
 
-    conn = get_conn()
-    conn.execute(
-        "UPDATE users SET tier = ?, "
-        "updated_at = datetime('now') WHERE user_id = ?",
-        (tier.value, user_id),
-    )
-    conn.commit()
+    session = get_session()
+    try:
+        user = session.get(User, user_id)
+        if user:
+            user.tier = tier.value
+            session.commit()
+    finally:
+        session.close()
 
     logger.info(
         "Subscription activated: user=%s tier=%s product=%s",
@@ -153,28 +151,32 @@ def activate_subscription(
 def expire_subscription(
     user_id: str, purchase_token: str,
 ) -> None:
-    conn = get_conn()
-    conn.execute(
-        "UPDATE subscriptions SET status = 'expired', "
-        "updated_at = datetime('now') "
-        "WHERE user_id = ? AND purchase_token = ?",
-        (user_id, purchase_token),
-    )
+    session = get_session()
+    try:
+        now = datetime.now(timezone.utc)
+        session.query(Subscription).filter(
+            and_(
+                Subscription.user_id == user_id,
+                Subscription.purchase_token == purchase_token,
+            ),
+        ).update({"status": "expired", "updated_at": now})
 
-    active = conn.execute(
-        "SELECT id FROM subscriptions "
-        "WHERE user_id = ? AND status = 'active'",
-        (user_id,),
-    ).fetchone()
+        active = session.query(Subscription).filter(
+            and_(
+                Subscription.user_id == user_id,
+                Subscription.status == "active",
+            ),
+        ).first()
 
-    if not active:
-        conn.execute(
-            "UPDATE users SET tier = 'free', "
-            "updated_at = datetime('now') WHERE user_id = ?",
-            (user_id,),
-        )
+        if not active:
+            user = session.get(User, user_id)
+            if user:
+                user.tier = "free"
 
-    conn.commit()
+        session.commit()
+    finally:
+        session.close()
+
     logger.info(
         "Subscription expired: user=%s token=%s...",
         user_id, purchase_token[:20] if purchase_token else "",
@@ -182,15 +184,23 @@ def expire_subscription(
 
 
 def get_active_subscription(user_id: str) -> dict | None:
-    conn = get_conn()
-    row = conn.execute(
-        "SELECT product_id, status, tier, "
-        "started_at, expires_at "
-        "FROM subscriptions WHERE user_id = ? "
-        "AND status = 'active' "
-        "ORDER BY created_at DESC LIMIT 1",
-        (user_id,),
-    ).fetchone()
-    if not row:
-        return None
-    return dict(row)
+    session = get_session()
+    try:
+        sub = session.query(Subscription).filter(
+            and_(
+                Subscription.user_id == user_id,
+                Subscription.status == "active",
+            ),
+        ).order_by(Subscription.created_at.desc()).first()
+
+        if not sub:
+            return None
+        return {
+            "product_id": sub.product_id,
+            "status": sub.status,
+            "tier": sub.tier,
+            "started_at": sub.started_at.isoformat() if sub.started_at else None,
+            "expires_at": sub.expires_at.isoformat() if sub.expires_at else None,
+        }
+    finally:
+        session.close()

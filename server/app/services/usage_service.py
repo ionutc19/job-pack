@@ -1,6 +1,8 @@
 import time
 
-from app.db import get_conn
+from sqlalchemy import func
+
+from app.db import UsageEvent, User, get_session
 from app.models.entitlements import (
     TIER_LIMITS,
     Tier,
@@ -8,71 +10,73 @@ from app.models.entitlements import (
 
 
 def ensure_user(user_id: str, device_id: str = "") -> None:
-    conn = get_conn()
-    conn.execute(
-        "INSERT OR IGNORE INTO users (user_id, device_id) "
-        "VALUES (?, ?)",
-        (user_id, device_id),
-    )
-    if device_id:
-        conn.execute(
-            "UPDATE users SET device_id = ?, "
-            "updated_at = datetime('now') "
-            "WHERE user_id = ? AND (device_id IS NULL "
-            "OR device_id = '' OR device_id != ?)",
-            (device_id, user_id, device_id),
-        )
-    conn.commit()
+    session = get_session()
+    try:
+        user = session.get(User, user_id)
+        if user is None:
+            user = User(user_id=user_id, device_id=device_id or None)
+            session.add(user)
+        elif device_id and user.device_id != device_id:
+            user.device_id = device_id
+        session.commit()
+    finally:
+        session.close()
 
 
 def get_user_tier(user_id: str) -> Tier:
-    conn = get_conn()
-    row = conn.execute(
-        "SELECT tier FROM users WHERE user_id = ?",
-        (user_id,),
-    ).fetchone()
-    if not row:
-        return Tier.FREE
+    session = get_session()
     try:
-        return Tier(row["tier"])
-    except ValueError:
-        return Tier.FREE
+        user = session.get(User, user_id)
+        if not user:
+            return Tier.FREE
+        try:
+            return Tier(user.tier)
+        except ValueError:
+            return Tier.FREE
+    finally:
+        session.close()
 
 
 def set_user_tier(user_id: str, tier: Tier) -> None:
-    conn = get_conn()
-    conn.execute(
-        "UPDATE users SET tier = ?, "
-        "updated_at = datetime('now') WHERE user_id = ?",
-        (tier.value, user_id),
-    )
-    conn.commit()
+    session = get_session()
+    try:
+        user = session.get(User, user_id)
+        if user:
+            user.tier = tier.value
+            session.commit()
+    finally:
+        session.close()
 
 
 def _count_in_window(
     user_id: str, module: str, window_seconds: int,
 ) -> int:
     cutoff = time.time() - window_seconds
-    conn = get_conn()
-    row = conn.execute(
-        "SELECT COUNT(*) as cnt FROM usage_events "
-        "WHERE user_id = ? AND module = ? AND ts > ?",
-        (user_id, module, cutoff),
-    ).fetchone()
-    return row["cnt"] if row else 0
+    session = get_session()
+    try:
+        count = session.query(func.count(UsageEvent.id)).filter(
+            UsageEvent.user_id == user_id,
+            UsageEvent.module == module,
+            UsageEvent.ts > cutoff,
+        ).scalar()
+        return count or 0
+    finally:
+        session.close()
 
 
 def _count_all_modules_in_window(
     user_id: str, window_seconds: int,
 ) -> int:
     cutoff = time.time() - window_seconds
-    conn = get_conn()
-    row = conn.execute(
-        "SELECT COUNT(*) as cnt FROM usage_events "
-        "WHERE user_id = ? AND ts > ?",
-        (user_id, cutoff),
-    ).fetchone()
-    return row["cnt"] if row else 0
+    session = get_session()
+    try:
+        count = session.query(func.count(UsageEvent.id)).filter(
+            UsageEvent.user_id == user_id,
+            UsageEvent.ts > cutoff,
+        ).scalar()
+        return count or 0
+    finally:
+        session.close()
 
 
 def check_usage(
@@ -108,13 +112,13 @@ def check_usage(
 
 
 def record_usage(user_id: str, module: str) -> None:
-    conn = get_conn()
-    conn.execute(
-        "INSERT INTO usage_events (user_id, module, ts) "
-        "VALUES (?, ?, ?)",
-        (user_id, module, time.time()),
-    )
-    conn.commit()
+    session = get_session()
+    try:
+        event = UsageEvent(user_id=user_id, module=module, ts=time.time())
+        session.add(event)
+        session.commit()
+    finally:
+        session.close()
 
 
 def get_usage_meta(user_id: str, module: str) -> dict:
@@ -159,10 +163,12 @@ def check_input_length(
 
 def cleanup_old_events(days: int = 90) -> int:
     cutoff = time.time() - (days * 24 * 3600)
-    conn = get_conn()
-    cursor = conn.execute(
-        "DELETE FROM usage_events WHERE ts < ?",
-        (cutoff,),
-    )
-    conn.commit()
-    return cursor.rowcount
+    session = get_session()
+    try:
+        count = session.query(UsageEvent).filter(
+            UsageEvent.ts < cutoff,
+        ).delete()
+        session.commit()
+        return count
+    finally:
+        session.close()

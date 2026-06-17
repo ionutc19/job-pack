@@ -61,7 +61,7 @@ cp server/.env.example server/.env
 | `GITHUB_TOKEN` | GitHub PAT for creating issues | Yes (for feedback) |
 | `GITHUB_REPO_OWNER` | GitHub repo owner | No (default: ionutc19) |
 | `GITHUB_REPO_NAME` | GitHub repo name | No (default: job-pack) |
-| `DATABASE_URL` | SQLite path (e.g. `sqlite:///data/jobcoach.db`) | No (default: `sqlite:///data/jobcoach.db`) |
+| `DATABASE_URL` | PostgreSQL connection URL (e.g. `postgresql+psycopg2://user:pass@host:5432/db?sslmode=require`) | Yes |
 | `ADMIN_SECRET` | Secret for admin/debug endpoints | No (admin endpoints disabled without it) |
 | `GOOGLE_PLAY_PACKAGE` | Android package name | No (default: `com.ionutc19.jobcoach`) |
 | `GOOGLE_PLAY_CREDENTIALS_JSON` | Google Play service account JSON path | No (purchase verification disabled without it) |
@@ -204,7 +204,7 @@ All content endpoints (`job-fit`, `profile-boost`, `apply-letter`) accept `X-Use
 
 ## Entitlements & Persistence
 
-Entitlements, usage counters, and subscription data are stored in a SQLite database (`data/jobcoach.db` by default). The schema is designed to be PostgreSQL-compatible for production migration. The database is auto-created on first startup.
+Entitlements, usage counters, and subscription data are stored in PostgreSQL via SQLAlchemy ORM. Migrations are managed with Alembic. Run `alembic upgrade head` to apply schema changes.
 
 **Privacy**: CV text, job descriptions, and generated results are NOT stored in the database. Only user identity, tier, subscription metadata, and usage event timestamps are persisted.
 
@@ -249,7 +249,7 @@ If `pip install` tries to compile `pydantic-core` from source (requires Rust/MSV
 - [ ] Integrate Google Play Billing Library in Flutter app
 - [ ] Add AdMob SDK for free tier
 - [ ] Add PDF text extraction for CV uploads
-- [ ] Migrate SQLite to PostgreSQL for production
+- [x] Migrate SQLite to PostgreSQL for production
 - [ ] Add dark theme support
 - [ ] Add local storage for saving past analyses
 - [ ] Add share functionality for cover letters

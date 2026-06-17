@@ -1,83 +1,127 @@
 import logging
-import sqlite3
-import threading
-from pathlib import Path
+
+from sqlalchemy import (
+    Column,
+    DateTime,
+    Float,
+    ForeignKey,
+    Index,
+    Integer,
+    String,
+    Text,
+    create_engine,
+    func,
+)
+from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 from app.config import settings
 
 logger = logging.getLogger(__name__)
 
-_local = threading.local()
+
+class Base(DeclarativeBase):
+    pass
 
 
-def _db_path() -> str:
-    return settings.database_url.replace("sqlite:///", "")
+class User(Base):
+    __tablename__ = "users"
+
+    user_id = Column(String(128), primary_key=True)
+    device_id = Column(String(128), nullable=True)
+    tier = Column(String(20), nullable=False, server_default="free")
+    created_at = Column(DateTime, nullable=False, server_default=func.now())
+    updated_at = Column(DateTime, nullable=False, server_default=func.now(), onupdate=func.now())
+
+    __table_args__ = (
+        Index("idx_users_device", "device_id"),
+    )
 
 
-def _get_conn() -> sqlite3.Connection:
-    if not hasattr(_local, "conn") or _local.conn is None:
-        path = _db_path()
-        Path(path).parent.mkdir(parents=True, exist_ok=True)
-        _local.conn = sqlite3.connect(path)
-        _local.conn.row_factory = sqlite3.Row
-        _local.conn.execute("PRAGMA journal_mode=WAL")
-        _local.conn.execute("PRAGMA foreign_keys=ON")
-    return _local.conn
+class Subscription(Base):
+    __tablename__ = "subscriptions"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(
+        String(128), ForeignKey("users.user_id"), nullable=False,
+    )
+    product_id = Column(String(100), nullable=False)
+    purchase_token = Column(Text, nullable=True)
+    status = Column(String(30), nullable=False, server_default="pending")
+    tier = Column(String(20), nullable=False)
+    started_at = Column(DateTime, nullable=True)
+    expires_at = Column(DateTime, nullable=True)
+    renewed_at = Column(DateTime, nullable=True)
+    canceled_at = Column(DateTime, nullable=True)
+    created_at = Column(DateTime, nullable=False, server_default=func.now())
+    updated_at = Column(DateTime, nullable=False, server_default=func.now(), onupdate=func.now())
+
+    __table_args__ = (
+        Index("idx_subs_user", "user_id"),
+        Index("idx_subs_token", "purchase_token"),
+    )
 
 
-def get_conn() -> sqlite3.Connection:
-    return _get_conn()
+class UsageEvent(Base):
+    __tablename__ = "usage_events"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(
+        String(128), ForeignKey("users.user_id"), nullable=False,
+    )
+    module = Column(String(50), nullable=False)
+    created_at = Column(DateTime, nullable=False, server_default=func.now())
+    ts = Column(Float, nullable=False)
+
+    __table_args__ = (
+        Index("idx_usage_user_module", "user_id", "module", "ts"),
+        Index("idx_usage_user_ts", "user_id", "ts"),
+    )
+
+
+_engine = None
+_SessionLocal = None
+
+
+def get_engine():
+    global _engine
+    if _engine is None:
+        url = settings.database_url
+        connect_args = {}
+        if url.startswith("sqlite"):
+            connect_args["check_same_thread"] = False
+        _engine = create_engine(url, pool_pre_ping=True, connect_args=connect_args)
+    return _engine
+
+
+def get_session_factory():
+    global _SessionLocal
+    if _SessionLocal is None:
+        _SessionLocal = sessionmaker(bind=get_engine(), expire_on_commit=False)
+    return _SessionLocal
+
+
+def get_session() -> Session:
+    return get_session_factory()()
 
 
 def init_db() -> None:
-    conn = _get_conn()
-    conn.executescript(_SCHEMA)
-    conn.commit()
-    logger.info("Database initialized at %s", _db_path())
+    engine = get_engine()
+    Base.metadata.create_all(bind=engine)
+    url = settings.database_url
+    safe_url = url.split("@")[-1] if "@" in url else url
+    logger.info("Database initialized: %s", safe_url)
 
 
-_SCHEMA = """
-CREATE TABLE IF NOT EXISTS users (
-    user_id       TEXT PRIMARY KEY,
-    device_id     TEXT,
-    tier          TEXT NOT NULL DEFAULT 'free',
-    created_at    TEXT NOT NULL DEFAULT (datetime('now')),
-    updated_at    TEXT NOT NULL DEFAULT (datetime('now'))
-);
+def dispose_engine() -> None:
+    global _engine, _SessionLocal
+    if _engine is not None:
+        _engine.dispose()
+        _engine = None
+        _SessionLocal = None
 
-CREATE INDEX IF NOT EXISTS idx_users_device
-    ON users(device_id);
 
-CREATE TABLE IF NOT EXISTS subscriptions (
-    id              INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id         TEXT NOT NULL REFERENCES users(user_id),
-    product_id      TEXT NOT NULL,
-    purchase_token  TEXT,
-    status          TEXT NOT NULL DEFAULT 'pending',
-    tier            TEXT NOT NULL,
-    started_at      TEXT,
-    expires_at      TEXT,
-    renewed_at      TEXT,
-    canceled_at     TEXT,
-    created_at      TEXT NOT NULL DEFAULT (datetime('now')),
-    updated_at      TEXT NOT NULL DEFAULT (datetime('now'))
-);
-
-CREATE INDEX IF NOT EXISTS idx_subs_user
-    ON subscriptions(user_id);
-CREATE INDEX IF NOT EXISTS idx_subs_token
-    ON subscriptions(purchase_token);
-
-CREATE TABLE IF NOT EXISTS usage_events (
-    id          INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id     TEXT NOT NULL REFERENCES users(user_id),
-    module      TEXT NOT NULL,
-    created_at  TEXT NOT NULL DEFAULT (datetime('now')),
-    ts          REAL NOT NULL
-);
-
-CREATE INDEX IF NOT EXISTS idx_usage_user_module
-    ON usage_events(user_id, module, ts);
-CREATE INDEX IF NOT EXISTS idx_usage_user_ts
-    ON usage_events(user_id, ts);
-"""
+def reset_engine() -> None:
+    """Re-create the engine from current settings. Used by tests."""
+    dispose_engine()
+    get_engine()
+    get_session_factory()

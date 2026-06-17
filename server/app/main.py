@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.db import init_db
+from app.db import dispose_engine, init_db
 from app.routers import (
     admin,
     apply_letter,
@@ -19,6 +19,7 @@ from app.routers import (
 async def lifespan(app: FastAPI):
     init_db()
     yield
+    dispose_engine()
 
 
 app = FastAPI(
@@ -28,7 +29,7 @@ app = FastAPI(
         "job fit analysis, profile boost, "
         "and cover letter generation."
     ),
-    version="0.2.0",
+    version="0.3.0",
     lifespan=lifespan,
 )
 
