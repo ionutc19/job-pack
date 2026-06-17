@@ -8,4 +8,4 @@ router = APIRouter(prefix="/api/apply-letter", tags=["Apply Letter"])
 
 @router.post("/generate", response_model=ApplyLetterResponse)
 async def generate(request: ApplyLetterRequest) -> ApplyLetterResponse:
-    return generate_cover_letter(request)
+    return await generate_cover_letter(request)

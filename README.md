@@ -33,7 +33,7 @@ job-pack/
 └── .github/workflows/       # CI pipelines
 ```
 
-**Service layer**: The mobile app uses a service locator that switches between mock and real backend via the `USE_MOCKS` compile-time flag. The backend returns rule-based responses by default. When `AI_API_KEY` is configured, it can forward to any OpenAI-compatible API (including Azure-hosted models).
+**Service layer**: The mobile app uses a service locator that switches between mock and real backend via the `USE_MOCKS` compile-time flag. When `AI_API_KEY` is configured, the backend sends requests to the configured AI provider (Azure OpenAI, OpenAI, or any compatible endpoint) via the `/responses` API. If AI is not configured or the call fails, all endpoints fall back to safe rule-based responses.
 
 **Localization**: The app stores the selected language in SharedPreferences and passes it to the backend as a `language` field. The backend generates all response text in the requested language.
 
@@ -53,11 +53,11 @@ cp server/.env.example server/.env
 
 | Variable | Description | Required |
 |----------|-------------|----------|
-| `AI_PROVIDER` | Provider name (`openai`, `azure`, etc.) | No (rule-based fallback) |
-| `AI_BASE_URL` | AI API base URL | No |
-| `AI_API_KEY` | AI API key | No (enables AI when set) |
-| `AI_MODEL` | Model identifier | No |
-| `AI_TIMEOUT_SECONDS` | Request timeout | No (default: 30) |
+| `AI_PROVIDER` | Provider name (`openai`, `azure_openai`, etc.) | No (rule-based fallback) |
+| `AI_BASE_URL` | AI API base URL (e.g. `https://your-resource.services.ai.azure.com/openai/v1`) | No |
+| `AI_API_KEY` | AI API key — enables AI when set | No |
+| `AI_MODEL` | Model identifier (e.g. `gpt-5.4-mini`) | No |
+| `AI_TIMEOUT_SECONDS` | Request timeout in seconds | No (default: 30) |
 | `GITHUB_TOKEN` | GitHub PAT for creating issues | Yes (for feedback) |
 | `GITHUB_REPO_OWNER` | GitHub repo owner | No (default: ionutc19) |
 | `GITHUB_REPO_NAME` | GitHub repo name | No (default: job-pack) |
@@ -155,13 +155,16 @@ The AAB will be at `mobile/build/app/outputs/bundle/release/app-release.aab`.
    ```
 5. The app will be available at `https://your-app.azurewebsites.net`
 
-**For Azure-hosted AI models**, set:
+**For Azure-hosted AI models** (OpenAI-compatible `/responses` API), set:
 ```
-AI_PROVIDER=azure
-AI_BASE_URL=https://your-resource.openai.azure.com/openai/deployments/your-deployment
-AI_API_KEY=your-azure-key
-AI_MODEL=your-deployment-name
+AI_PROVIDER=azure_openai
+AI_BASE_URL=https://your-resource.services.ai.azure.com/openai/v1
+AI_API_KEY=your-azure-api-key
+AI_MODEL=gpt-5.4-mini
+AI_TIMEOUT_SECONDS=60
 ```
+
+The backend calls `{AI_BASE_URL}/responses` and parses the response. If the AI call fails or returns unparseable output, all endpoints gracefully fall back to rule-based responses — the app never crashes due to AI unavailability.
 
 ### Single Linux VM
 
@@ -212,7 +215,7 @@ If `pip install` tries to compile `pydantic-core` from source (requires Rust/MSV
 
 ## Known Next Steps
 
-- [ ] Integrate real AI provider via `call_ai_provider()` in service functions
+- [x] Integrate real AI provider via Azure OpenAI `/responses` API
 - [ ] Add PDF text extraction for CV uploads
 - [ ] Add authentication / rate limiting
 - [ ] Add dark theme support
