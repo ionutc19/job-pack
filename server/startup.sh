@@ -1,11 +1,13 @@
 #!/bin/bash
+set -e
 # Azure App Service startup script
 # Set as: az webapp config set --startup-file "startup.sh"
 
-# Run database migrations before starting the server
+echo "Running Alembic migrations..."
 alembic upgrade head
+echo "Migrations complete."
 
-gunicorn app.main:app \
+exec gunicorn app.main:app \
   --workers 4 \
   --worker-class uvicorn.workers.UvicornWorker \
   --bind 0.0.0.0:8000 \
