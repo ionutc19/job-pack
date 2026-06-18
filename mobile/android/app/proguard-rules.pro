@@ -3,6 +3,9 @@
 -keep class io.flutter.plugins.** { *; }
 -keep class io.flutter.plugin.** { *; }
 
+## Google Play Core (deferred components, referenced by Flutter engine)
+-dontwarn com.google.android.play.core.**
+
 ## Google Mobile Ads
 -keep class com.google.android.gms.ads.** { *; }
 -keep class com.google.ads.** { *; }
