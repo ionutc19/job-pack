@@ -5,14 +5,14 @@
       <stop offset="100%" style="stop-color:#7C3AED"/>
     </linearGradient>
   </defs>
-  <!-- Background circle for app icon -->
   <circle cx="96" cy="96" r="90" fill="url(#bg)"/>
-  <!-- J letter -->
-  <text x="38" y="132" font-family="system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="100" font-weight="700" fill="white" letter-spacing="-4">J</text>
-  <!-- C letter -->
-  <text x="92" y="132" font-family="system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="100" font-weight="700" fill="white" letter-spacing="-4">C</text>
-  <!-- AI sparkle 1 -->
-  <path d="M158 30 L162 42 L174 46 L162 50 L158 62 L154 50 L142 46 L154 42 Z" fill="white" opacity="0.9"/>
-  <!-- AI sparkle 2 (smaller) -->
-  <path d="M140 18 L143 26 L151 29 L143 32 L140 40 L137 32 L129 29 L137 26 Z" fill="white" opacity="0.65"/>
+  <!-- J - clean block letter, well inside circle -->
+  <rect x="38" y="52" width="40" height="14" rx="2" fill="white"/>
+  <rect x="52" y="52" width="14" height="68" rx="1" fill="white"/>
+  <path d="M38 120 Q38 138 54 138 Q66 138 66 120 L66 112 L52 112 L52 120 Q52 126 48 126 Q44 126 44 120 L44 114 L38 114 Z" fill="white"/>
+  <!-- C - clean block letter, well inside circle -->
+  <path d="M126 66 L116 76 Q112 68 106 64 Q100 60 94 64 Q88 68 88 78 L88 114 Q88 124 94 128 Q100 132 106 128 Q112 124 116 116 L126 126 Q118 140 104 140 Q88 140 80 130 Q74 122 74 114 L74 78 Q74 68 80 60 Q88 50 104 50 Q118 50 126 66 Z" fill="white"/>
+  <!-- AI sparkle -->
+  <path d="M154 34 L157 44 L167 47 L157 50 L154 60 L151 50 L141 47 L151 44 Z" fill="white" opacity="0.85"/>
+  <path d="M140 22 L142 28 L148 30 L142 32 L140 38 L138 32 L132 30 L138 28 Z" fill="white" opacity="0.55"/>
 </svg>
