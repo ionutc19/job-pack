@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../l10n/app_localizations.dart';
 import '../services/service_locator.dart';
+import '../widgets/file_upload_button.dart';
 import '../widgets/loading_button.dart';
 import '../widgets/section_card.dart';
 
@@ -82,22 +83,42 @@ class _CoverLetterScreenState extends State<CoverLetterScreen> {
                     ),
               ),
               const SizedBox(height: 20),
+              Row(
+                children: [
+                  Text(l.cvResumeText, style: Theme.of(context).textTheme.titleSmall),
+                  const Spacer(),
+                  FileUploadButton(
+                    label: l.uploadCv,
+                    targetController: _cvController,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
               TextFormField(
                 controller: _cvController,
                 maxLines: 5,
                 decoration: InputDecoration(
-                  labelText: l.cvResumeText,
                   hintText: l.cvHint,
                   alignLabelWithHint: true,
                 ),
                 validator: (v) => (v == null || v.length < 10) ? l.minCharsError : null,
               ),
               const SizedBox(height: 12),
+              Row(
+                children: [
+                  Text(l.jobDescription, style: Theme.of(context).textTheme.titleSmall),
+                  const Spacer(),
+                  FileUploadButton(
+                    label: l.uploadJd,
+                    targetController: _jdController,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
               TextFormField(
                 controller: _jdController,
                 maxLines: 5,
                 decoration: InputDecoration(
-                  labelText: l.jobDescription,
                   hintText: l.jobDescriptionHint,
                   alignLabelWithHint: true,
                 ),

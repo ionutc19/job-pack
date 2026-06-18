@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../config/app_config.dart';
 import '../l10n/app_localizations.dart';
+import '../services/billing_service.dart';
 import '../services/service_locator.dart';
 
 class PlansScreen extends StatefulWidget {
@@ -13,11 +14,34 @@ class PlansScreen extends StatefulWidget {
 class _PlansScreenState extends State<PlansScreen> {
   String _currentTier = 'free';
   bool _loading = false;
+  final _billing = BillingService();
 
   @override
   void initState() {
     super.initState();
+    _billing.addListener(_onBillingUpdate);
     if (!AppConfig.useMockServices) {
+      _fetchTier();
+    }
+  }
+
+  @override
+  void dispose() {
+    _billing.removeListener(_onBillingUpdate);
+    super.dispose();
+  }
+
+  void _onBillingUpdate() {
+    if (!mounted) return;
+    setState(() {});
+
+    if (_billing.error != null && _billing.error!.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(_billing.error!)),
+      );
+    }
+
+    if (_billing.lastPurchasedTier != null) {
       _fetchTier();
     }
   }
@@ -37,9 +61,30 @@ class _PlansScreenState extends State<PlansScreen> {
     }
   }
 
+  void _onUpgrade(String tier) {
+    if (!_billing.available) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppLocalizations.of(context).billingUnavailable),
+        ),
+      );
+      return;
+    }
+
+    final productId = BillingService.productIdForTier(tier);
+    _billing.purchase(productId);
+  }
+
+  void _onRestore() {
+    _billing.restorePurchases();
+  }
+
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
+    final purchasing = _billing.state == BillingState.purchasing;
+    final restoring = _billing.state == BillingState.restoring;
+
     return Scaffold(
       appBar: AppBar(title: Text(l.plans)),
       body: ListView(
@@ -64,7 +109,6 @@ class _PlansScreenState extends State<PlansScreen> {
             price: l.planFreePrice,
             color: Colors.grey.shade700,
             features: [
-              _Feature(l.planFreeAds, false),
               _Feature(l.planFreeRequests, true),
               _Feature(l.planFreeModules, true),
             ],
@@ -75,25 +119,25 @@ class _PlansScreenState extends State<PlansScreen> {
           const SizedBox(height: 16),
           _PlanCard(
             title: l.planPremium,
-            price: l.planPremiumPrice,
+            price: _billing.priceFor('jobcoach_premium_monthly') ?? l.planPremiumPrice,
             color: const Color(0xFF2563EB),
             features: [
-              _Feature(l.planPremiumNoAds, true),
               _Feature(l.planPremiumRequests, true),
               _Feature(l.planPremiumModules, true),
             ],
             isCurrent: _currentTier == 'premium',
             currentLabel: l.currentPlan,
             actionLabel: _currentTier == 'premium' ? null : l.upgradeTo(l.planPremium),
+            actionBusy: purchasing,
+            onAction: () => _onUpgrade('premium'),
             loading: _loading,
           ),
           const SizedBox(height: 16),
           _PlanCard(
             title: l.planPro,
-            price: l.planProPrice,
+            price: _billing.priceFor('jobcoach_pro_monthly') ?? l.planProPrice,
             color: const Color(0xFF7C3AED),
             features: [
-              _Feature(l.planProNoAds, true),
               _Feature(l.planProRequests, true),
               _Feature(l.planProModules, true),
               _Feature(l.planProFairUse, true),
@@ -101,15 +145,18 @@ class _PlansScreenState extends State<PlansScreen> {
             isCurrent: _currentTier == 'pro',
             currentLabel: l.currentPlan,
             actionLabel: _currentTier == 'pro' ? null : l.upgradeTo(l.planPro),
+            actionBusy: purchasing,
+            onAction: () => _onUpgrade('pro'),
             loading: _loading,
           ),
           const SizedBox(height: 24),
-          Text(
-            l.billingNote,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Colors.grey.shade500,
-                ),
+          Center(
+            child: TextButton(
+              onPressed: restoring ? null : _onRestore,
+              child: Text(
+                restoring ? l.restoringPurchases : l.restorePurchases,
+              ),
+            ),
           ),
         ],
       ),
@@ -131,6 +178,8 @@ class _PlanCard extends StatelessWidget {
   final bool isCurrent;
   final String? currentLabel;
   final String? actionLabel;
+  final bool actionBusy;
+  final VoidCallback? onAction;
   final bool loading;
 
   const _PlanCard({
@@ -141,6 +190,8 @@ class _PlanCard extends StatelessWidget {
     required this.isCurrent,
     this.currentLabel,
     this.actionLabel,
+    this.actionBusy = false,
+    this.onAction,
     this.loading = false,
   });
 
@@ -221,20 +272,21 @@ class _PlanCard extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          AppLocalizations.of(context).billingComingSoon,
-                        ),
-                      ),
-                    );
-                  },
+                  onPressed: actionBusy ? null : onAction,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: color,
                     foregroundColor: Colors.white,
                   ),
-                  child: Text(actionLabel!),
+                  child: actionBusy
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : Text(actionLabel!),
                 ),
               ),
             ],

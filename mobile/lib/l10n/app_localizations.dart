@@ -137,24 +137,29 @@ class AppLocalizations {
   String get currentPlan => get('currentPlan');
   String get planFree => get('planFree');
   String get planFreePrice => get('planFreePrice');
-  String get planFreeAds => get('planFreeAds');
   String get planFreeRequests => get('planFreeRequests');
   String get planFreeModules => get('planFreeModules');
   String get planPremium => get('planPremium');
   String get planPremiumPrice => get('planPremiumPrice');
-  String get planPremiumNoAds => get('planPremiumNoAds');
   String get planPremiumRequests => get('planPremiumRequests');
   String get planPremiumModules => get('planPremiumModules');
   String get planPro => get('planPro');
   String get planProPrice => get('planProPrice');
-  String get planProNoAds => get('planProNoAds');
   String get planProRequests => get('planProRequests');
   String get planProModules => get('planProModules');
   String get planProFairUse => get('planProFairUse');
   String upgradeTo(String plan) => get('upgradeTo').replaceAll('{plan}', plan);
-  String get billingNote => get('billingNote');
-  String get billingComingSoon => get('billingComingSoon');
   String get planUpgradeCta => get('planUpgradeCta');
+  String get restorePurchases => get('restorePurchases');
+  String get restoringPurchases => get('restoringPurchases');
+  String get billingUnavailable => get('billingUnavailable');
+
+  // File upload
+  String get uploadCv => get('uploadCv');
+  String get uploadJd => get('uploadJd');
+  String get extractingText => get('extractingText');
+  String get removeFile => get('removeFile');
+  String get fileTooLarge => get('fileTooLarge');
 
   // Privacy
   String get privacyTitle => get('privacyTitle');
@@ -275,24 +280,29 @@ class AppLocalizations {
     'currentPlan': 'Current',
     'planFree': 'Free',
     'planFreePrice': '\$0 / month',
-    'planFreeAds': 'Ads enabled',
     'planFreeRequests': '5 requests per month per module',
     'planFreeModules': 'All 3 modules included',
     'planPremium': 'Premium',
     'planPremiumPrice': '\$3.99 / month',
-    'planPremiumNoAds': 'No ads',
     'planPremiumRequests': '20 requests per day per module',
     'planPremiumModules': 'All 3 modules included',
     'planPro': 'Pro',
     'planProPrice': '\$9.99 / month',
-    'planProNoAds': 'No ads',
     'planProRequests': 'Unlimited access',
     'planProModules': 'All 3 modules included',
     'planProFairUse': 'Fair use policy applies',
     'upgradeTo': 'Upgrade to {plan}',
-    'billingNote': 'Billing integration coming soon. Plans shown for preview.',
-    'billingComingSoon': 'Billing is not yet available. Coming soon!',
     'planUpgradeCta': 'Upgrade for more daily analyses',
+    'restorePurchases': 'Restore Purchases',
+    'restoringPurchases': 'Restoring...',
+    'billingUnavailable': 'In-app purchases are not available on this device',
+
+    // File upload
+    'uploadCv': 'Upload',
+    'uploadJd': 'Upload',
+    'extractingText': 'Extracting...',
+    'removeFile': 'Remove file',
+    'fileTooLarge': 'File exceeds 10 MB limit',
 
     // Privacy
     'privacyTitle': 'Privacy & Legal',
@@ -414,24 +424,29 @@ class AppLocalizations {
     'currentPlan': 'Curent',
     'planFree': 'Gratuit',
     'planFreePrice': '\$0 / lună',
-    'planFreeAds': 'Reclame activate',
     'planFreeRequests': '5 cereri pe lună per modul',
     'planFreeModules': 'Toate cele 3 module incluse',
     'planPremium': 'Premium',
     'planPremiumPrice': '\$3,99 / lună',
-    'planPremiumNoAds': 'Fără reclame',
     'planPremiumRequests': '20 cereri pe zi per modul',
     'planPremiumModules': 'Toate cele 3 module incluse',
     'planPro': 'Pro',
     'planProPrice': '\$9,99 / lună',
-    'planProNoAds': 'Fără reclame',
     'planProRequests': 'Acces nelimitat',
     'planProModules': 'Toate cele 3 module incluse',
     'planProFairUse': 'Se aplică politica de utilizare corectă',
     'upgradeTo': 'Treci la {plan}',
-    'billingNote': 'Integrarea facturării vine în curând. Planurile sunt afișate pentru previzualizare.',
-    'billingComingSoon': 'Facturarea nu este încă disponibilă. În curând!',
     'planUpgradeCta': 'Upgradează pentru mai multe analize zilnice',
+    'restorePurchases': 'Restaurează Achizițiile',
+    'restoringPurchases': 'Se restaurează...',
+    'billingUnavailable': 'Achizițiile din aplicație nu sunt disponibile pe acest dispozitiv',
+
+    // File upload
+    'uploadCv': 'Încarcă',
+    'uploadJd': 'Încarcă',
+    'extractingText': 'Se extrage...',
+    'removeFile': 'Elimină fișierul',
+    'fileTooLarge': 'Fișierul depășește limita de 10 MB',
 
     // Privacy
     'privacyTitle': 'Confidențialitate și Legal',

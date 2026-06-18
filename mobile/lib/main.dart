@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
+import 'config/ad_config.dart';
 import 'config/theme.dart';
 import 'l10n/app_localizations.dart';
 import 'l10n/language_provider.dart';
@@ -13,6 +15,7 @@ import 'screens/settings_screen.dart';
 import 'screens/feedback_screen.dart';
 import 'screens/plans_screen.dart';
 import 'screens/privacy_screen.dart';
+import 'services/billing_service.dart';
 import 'services/user_identity.dart';
 
 void main() async {
@@ -20,6 +23,13 @@ void main() async {
   final languageProvider = LanguageProvider();
   await languageProvider.load();
   await UserIdentity().load();
+
+  if (AdConfig.adsEnabled) {
+    MobileAds.instance.initialize();
+  }
+
+  BillingService().initialize();
+
   runApp(JobCoachApp(languageProvider: languageProvider));
 }
 

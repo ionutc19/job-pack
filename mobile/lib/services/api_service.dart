@@ -114,6 +114,16 @@ class ApiService {
     return data['success'] as bool;
   }
 
+  Future<Map<String, dynamic>> verifyPurchase({
+    required String productId,
+    required String purchaseToken,
+  }) async {
+    return await _post('/api/entitlements/verify-purchase', {
+      'product_id': productId,
+      'purchase_token': purchaseToken,
+    });
+  }
+
   Future<bool> checkHealth() async {
     try {
       final response = await _client.get(

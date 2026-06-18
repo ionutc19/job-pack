@@ -9,6 +9,7 @@ from app.routers import (
     apply_letter,
     entitlements,
     feedback,
+    file_upload,
     health,
     job_fit,
     profile_boost,
@@ -47,3 +48,4 @@ app.include_router(apply_letter.router)
 app.include_router(feedback.router)
 app.include_router(entitlements.router)
 app.include_router(admin.router)
+app.include_router(file_upload.router)
