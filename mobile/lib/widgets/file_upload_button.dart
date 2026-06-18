@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import 'package:file_picker/file_picker.dart';
 import '../config/app_config.dart';
 import '../l10n/app_localizations.dart';
@@ -86,7 +87,22 @@ class _FileUploadButtonState extends State<FileUploadButton> {
     return result == true;
   }
 
+  static String _mimeType(String filename) {
+    final ext = filename.split('.').last.toLowerCase();
+    switch (ext) {
+      case 'pdf':
+        return 'application/pdf';
+      case 'docx':
+        return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+      case 'txt':
+        return 'text/plain';
+      default:
+        return 'application/octet-stream';
+    }
+  }
+
   Future<void> _pickAndUpload() async {
+    final l = AppLocalizations.of(context);
     final consented = await _showConsentDialog();
     if (!consented) return;
 
@@ -126,6 +142,7 @@ class _FileUploadButtonState extends State<FileUploadButton> {
           'file',
           file.bytes!,
           filename: file.name,
+          contentType: MediaType.parse(_mimeType(file.name)),
         ));
 
       final response = await request.send();
@@ -136,10 +153,17 @@ class _FileUploadButtonState extends State<FileUploadButton> {
         widget.targetController.text = data['text'] as String;
         setState(() => _errorMessage = null);
       } else {
+        String detail;
+        try {
+          final data = jsonDecode(body);
+          detail = data['detail'] as String? ?? l.fileUploadError;
+        } catch (_) {
+          detail = l.fileUploadError;
+        }
         if (mounted) {
           setState(() {
             _fileName = null;
-            _errorMessage = AppLocalizations.of(context).fileUploadError;
+            _errorMessage = detail;
           });
         }
       }

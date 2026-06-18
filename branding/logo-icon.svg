@@ -5,14 +5,28 @@
       <stop offset="100%" style="stop-color:#7C3AED"/>
     </linearGradient>
   </defs>
-  <circle cx="96" cy="96" r="90" fill="url(#bg)"/>
-  <!-- J - clean block letter, well inside circle -->
-  <rect x="38" y="52" width="40" height="14" rx="2" fill="white"/>
-  <rect x="52" y="52" width="14" height="68" rx="1" fill="white"/>
-  <path d="M38 120 Q38 138 54 138 Q66 138 66 120 L66 112 L52 112 L52 120 Q52 126 48 126 Q44 126 44 120 L44 114 L38 114 Z" fill="white"/>
-  <!-- C - clean block letter, well inside circle -->
-  <path d="M126 66 L116 76 Q112 68 106 64 Q100 60 94 64 Q88 68 88 78 L88 114 Q88 124 94 128 Q100 132 106 128 Q112 124 116 116 L126 126 Q118 140 104 140 Q88 140 80 130 Q74 122 74 114 L74 78 Q74 68 80 60 Q88 50 104 50 Q118 50 126 66 Z" fill="white"/>
-  <!-- AI sparkle -->
-  <path d="M154 34 L157 44 L167 47 L157 50 L154 60 L151 50 L141 47 L151 44 Z" fill="white" opacity="0.85"/>
-  <path d="M140 22 L142 28 L148 30 L142 32 L140 38 L138 32 L132 30 L138 28 Z" fill="white" opacity="0.55"/>
+  <circle cx="96" cy="96" r="92" fill="url(#bg)"/>
+  <!-- J — bold, balanced with C -->
+  <path d="
+    M 30 58 L 70 58 L 70 72 L 58 72 L 58 112
+    Q 58 122 52 127 Q 46 132 36 132 L 36 118
+    Q 41 118 43 115 Q 46 112 46 106 L 46 72 L 30 72 Z
+  " fill="white"/>
+  <!-- C — bold, balanced with J -->
+  <path d="
+    M 148 76 L 136 86
+    Q 132 78 126 74 Q 120 70 112 70
+    Q 104 70 100 76 Q 96 82 96 92 L 96 100
+    Q 96 110 100 116 Q 104 122 112 122
+    Q 120 122 126 118 Q 132 114 136 106
+    L 148 116
+    Q 142 126 134 132 Q 124 138 112 138
+    Q 96 138 88 126 Q 84 120 84 108 L 84 84
+    Q 84 72 88 66 Q 96 54 112 54
+    Q 124 54 134 60 Q 142 66 148 76 Z
+  " fill="white"/>
+  <!-- AI sparkle 1 -->
+  <path d="M160 28 L163 38 L173 41 L163 44 L160 54 L157 44 L147 41 L157 38 Z" fill="white" opacity="0.9"/>
+  <!-- AI sparkle 2 -->
+  <path d="M146 16 L148 22 L154 24 L148 26 L146 32 L144 26 L138 24 L144 22 Z" fill="white" opacity="0.6"/>
 </svg>

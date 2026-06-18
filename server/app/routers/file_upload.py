@@ -17,7 +17,13 @@ async def extract_text_endpoint(file: UploadFile) -> dict:
     try:
         text = await extract_text(file)
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=422, detail=str(e))
+    except Exception:
+        logger.exception("Unexpected error during text extraction")
+        raise HTTPException(
+            status_code=500,
+            detail="An unexpected error occurred while processing your file. Please try again.",
+        )
     finally:
         await file.close()
 
