@@ -154,6 +154,7 @@ class AppLocalizations {
   String upgradeTo(String plan) => get('upgradeTo').replaceAll('{plan}', plan);
   String get billingNote => get('billingNote');
   String get billingComingSoon => get('billingComingSoon');
+  String get planUpgradeCta => get('planUpgradeCta');
 
   // Privacy
   String get privacyTitle => get('privacyTitle');
@@ -291,6 +292,7 @@ class AppLocalizations {
     'upgradeTo': 'Upgrade to {plan}',
     'billingNote': 'Billing integration coming soon. Plans shown for preview.',
     'billingComingSoon': 'Billing is not yet available. Coming soon!',
+    'planUpgradeCta': 'Upgrade for more daily analyses',
 
     // Privacy
     'privacyTitle': 'Privacy & Legal',
@@ -429,6 +431,7 @@ class AppLocalizations {
     'upgradeTo': 'Treci la {plan}',
     'billingNote': 'Integrarea facturării vine în curând. Planurile sunt afișate pentru previzualizare.',
     'billingComingSoon': 'Facturarea nu este încă disponibilă. În curând!',
+    'planUpgradeCta': 'Upgradează pentru mai multe analize zilnice',
 
     // Privacy
     'privacyTitle': 'Confidențialitate și Legal',

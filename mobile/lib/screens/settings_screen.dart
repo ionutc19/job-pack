@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../config/app_config.dart';
@@ -88,15 +89,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
             subtitle: Text(langProvider.locale.languageCode == 'ro' ? l.romanian : l.english),
             trailing: const LanguageDropdown(),
           ),
-          ListTile(
-            leading: const Icon(Icons.science_outlined),
-            title: Text(l.mockServices),
-            subtitle: Text(AppConfig.useMockServices ? l.enabled : l.disabled),
-            trailing: Icon(
-              AppConfig.useMockServices ? Icons.check_circle : Icons.cloud,
-              color: AppConfig.useMockServices ? Colors.orange : Colors.green,
+          if (kDebugMode)
+            ListTile(
+              leading: const Icon(Icons.science_outlined),
+              title: Text(l.mockServices),
+              subtitle: Text(AppConfig.useMockServices ? l.enabled : l.disabled),
+              trailing: Icon(
+                AppConfig.useMockServices ? Icons.check_circle : Icons.cloud,
+                color: AppConfig.useMockServices ? Colors.orange : Colors.green,
+              ),
             ),
-          ),
           _SectionHeader(title: l.account),
           ListTile(
             leading: const Icon(Icons.workspace_premium_outlined),
@@ -116,30 +118,32 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ),
           ),
-          _SectionHeader(title: l.backend),
-          ListTile(
-            leading: const Icon(Icons.dns_outlined),
-            title: Text(l.baseUrl),
-            subtitle: Text(AppConfig.baseUrl),
-          ),
-          ListTile(
-            leading: _checking
-                ? const SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : Icon(
-                    _backendReachable ? Icons.check_circle : Icons.error_outline,
-                    color: _backendReachable ? Colors.green : Colors.grey,
-                  ),
-            title: Text(l.connectionStatus),
-            subtitle: Text(_backendReachable ? l.connected : l.notChecked),
-            trailing: TextButton(
-              onPressed: _checking ? null : _checkBackend,
-              child: Text(l.test),
+          if (kDebugMode) ...[
+            _SectionHeader(title: l.backend),
+            ListTile(
+              leading: const Icon(Icons.dns_outlined),
+              title: Text(l.baseUrl),
+              subtitle: Text(AppConfig.baseUrl),
             ),
-          ),
+            ListTile(
+              leading: _checking
+                  ? const SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : Icon(
+                      _backendReachable ? Icons.check_circle : Icons.error_outline,
+                      color: _backendReachable ? Colors.green : Colors.grey,
+                    ),
+              title: Text(l.connectionStatus),
+              subtitle: Text(_backendReachable ? l.connected : l.notChecked),
+              trailing: TextButton(
+                onPressed: _checking ? null : _checkBackend,
+                child: Text(l.test),
+              ),
+            ),
+          ],
           _SectionHeader(title: l.support),
           ListTile(
             leading: const Icon(Icons.feedback_outlined),

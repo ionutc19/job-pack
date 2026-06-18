@@ -1,9 +1,48 @@
 import 'package:flutter/material.dart';
+import '../config/app_config.dart';
 import '../l10n/app_localizations.dart';
+import '../services/service_locator.dart';
 import '../widgets/language_dropdown.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  String _currentTier = 'free';
+
+  @override
+  void initState() {
+    super.initState();
+    if (!AppConfig.useMockServices) {
+      _fetchTier();
+    }
+  }
+
+  Future<void> _fetchTier() async {
+    try {
+      final data = await ServiceLocator().api.getEntitlements();
+      if (mounted) {
+        setState(() {
+          _currentTier = data['tier'] as String? ?? 'free';
+        });
+      }
+    } catch (_) {}
+  }
+
+  String _tierLabel(AppLocalizations l) {
+    switch (_currentTier) {
+      case 'premium':
+        return l.planPremium;
+      case 'pro':
+        return l.planPro;
+      default:
+        return l.planFree;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,6 +92,12 @@ class HomeScreen extends StatelessWidget {
               onTap: () => Navigator.pushNamed(context, '/cover-letter'),
             ),
             const Spacer(),
+            _PlanBanner(
+              tierLabel: _tierLabel(l),
+              isFree: _currentTier == 'free',
+              onTap: () => Navigator.pushNamed(context, '/plans'),
+            ),
+            const SizedBox(height: 8),
             Center(
               child: TextButton.icon(
                 onPressed: () => Navigator.pushNamed(context, '/feedback'),
@@ -122,6 +167,74 @@ class _HomeCard extends StatelessWidget {
                 ),
               ),
               Icon(Icons.chevron_right, color: Colors.grey.shade400),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _PlanBanner extends StatelessWidget {
+  final String tierLabel;
+  final bool isFree;
+  final VoidCallback onTap;
+
+  const _PlanBanner({
+    required this.tierLabel,
+    required this.isFree,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    const color = Color(0xFF7C3AED);
+
+    return Card(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(
+                  Icons.workspace_premium_outlined,
+                  color: color,
+                  size: 22,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${l.plans} • $tierLabel',
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                    ),
+                    if (isFree) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        l.planUpgradeCta,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: color,
+                            ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              Icon(Icons.chevron_right, color: Colors.grey.shade400, size: 20),
             ],
           ),
         ),
