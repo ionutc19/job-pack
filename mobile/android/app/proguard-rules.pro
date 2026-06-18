@@ -16,6 +16,20 @@
 
 ## file_picker
 -keep class com.mr.flutter.plugin.filepicker.** { *; }
+
+## AndroidX Startup (InitializationProvider — crashes on launch if stripped)
+-keep class androidx.startup.** { *; }
+
+## AndroidX WorkManager (used by google_mobile_ads for background scheduling)
+-keep class androidx.work.** { *; }
+
+## AndroidX Room (WorkManager's internal database)
+-keep class androidx.room.** { *; }
+-keep class * extends androidx.room.RoomDatabase { *; }
+-keep @androidx.room.Entity class * { *; }
+-keep @androidx.room.Dao class * { *; }
+
+## AndroidX Lifecycle
 -keep class androidx.lifecycle.** { *; }
 
 ## Keep annotations
