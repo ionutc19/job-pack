@@ -17,7 +17,7 @@ android {
     defaultConfig {
         applicationId = "com.ionutc19.jobcoach"
         minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
+        targetSdk = 36
         versionCode = flutter.versionCode
         versionName = flutter.versionName
         manifestPlaceholders["admobAppId"] = findProperty("ADMOB_APP_ID")?.toString()
