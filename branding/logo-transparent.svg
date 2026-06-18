@@ -1,19 +1,20 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120" width="400" height="120">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 100" width="520" height="100">
   <defs>
     <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" style="stop-color:#2563EB"/>
       <stop offset="100%" style="stop-color:#7C3AED"/>
     </linearGradient>
   </defs>
-  <!-- J -->
-  <text x="0" y="95" font-family="system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="110" font-weight="700" fill="url(#grad)" letter-spacing="-4">J</text>
-  <!-- C -->
-  <text x="60" y="95" font-family="system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="110" font-weight="700" fill="url(#grad)" letter-spacing="-4">C</text>
-  <!-- Wordmark -->
-  <text x="138" y="72" font-family="system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="40" font-weight="600" fill="#1E293B">Job Coach</text>
-  <text x="138" y="100" font-family="system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#64748B">AI-Powered Career Toolkit</text>
-  <!-- AI sparkle near JC -->
-  <path d="M112 12 L116 24 L128 28 L116 32 L112 44 L108 32 L96 28 L108 24 Z" fill="#7C3AED" opacity="0.8"/>
-  <!-- AI sparkle 2 -->
-  <path d="M88 2 L91 10 L99 13 L91 16 L88 24 L85 16 L77 13 L85 10 Z" fill="#2563EB" opacity="0.6"/>
+  <!-- JC monogram -->
+  <text x="4" y="76" font-family="system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="84" font-weight="800" fill="url(#grad)">JC</text>
+  <!-- AI sparkle 1 -->
+  <path d="M120 10 L123 20 L133 23 L123 26 L120 36 L117 26 L107 23 L117 20 Z" fill="#7C3AED" opacity="0.85"/>
+  <!-- AI sparkle 2 (smaller) -->
+  <path d="M138 2 L140 8 L146 10 L140 12 L138 18 L136 12 L130 10 L136 8 Z" fill="#2563EB" opacity="0.55"/>
+  <!-- Divider line -->
+  <line x1="158" y1="18" x2="158" y2="82" stroke="#E2E8F0" stroke-width="1.5"/>
+  <!-- Job Coach -->
+  <text x="176" y="52" font-family="system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="36" font-weight="700" fill="#1E293B">Job Coach</text>
+  <!-- Tagline -->
+  <text x="176" y="78" font-family="system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#94A3B8" letter-spacing="0.5">AI-Powered Career Toolkit</text>
 </svg>
