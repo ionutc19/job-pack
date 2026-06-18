@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../config/app_config.dart';
 import '../l10n/app_localizations.dart';
 import '../services/service_locator.dart';
+import '../widgets/banner_ad_widget.dart';
 import '../widgets/language_dropdown.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -92,6 +93,10 @@ class _HomeScreenState extends State<HomeScreen> {
               onTap: () => Navigator.pushNamed(context, '/cover-letter'),
             ),
             const Spacer(),
+            if (_currentTier == 'free') ...[
+              const Center(child: BannerAdWidget()),
+              const SizedBox(height: 8),
+            ],
             _PlanBanner(
               tierLabel: _tierLabel(l),
               isFree: _currentTier == 'free',

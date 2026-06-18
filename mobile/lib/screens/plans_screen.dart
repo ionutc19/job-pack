@@ -109,6 +109,7 @@ class _PlansScreenState extends State<PlansScreen> {
             price: l.planFreePrice,
             color: Colors.grey.shade700,
             features: [
+              _Feature(l.planFreeAds, false),
               _Feature(l.planFreeRequests, true),
               _Feature(l.planFreeModules, true),
             ],
@@ -122,6 +123,7 @@ class _PlansScreenState extends State<PlansScreen> {
             price: _billing.priceFor('jobcoach_premium_monthly') ?? l.planPremiumPrice,
             color: const Color(0xFF2563EB),
             features: [
+              _Feature(l.planPremiumNoAds, true),
               _Feature(l.planPremiumRequests, true),
               _Feature(l.planPremiumModules, true),
             ],
@@ -138,6 +140,7 @@ class _PlansScreenState extends State<PlansScreen> {
             price: _billing.priceFor('jobcoach_pro_monthly') ?? l.planProPrice,
             color: const Color(0xFF7C3AED),
             features: [
+              _Feature(l.planProNoAds, true),
               _Feature(l.planProRequests, true),
               _Feature(l.planProModules, true),
               _Feature(l.planProFairUse, true),

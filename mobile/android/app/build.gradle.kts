@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.job_pack"
+    namespace = "com.ionutc19.jobcoach"
     compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
@@ -21,7 +21,7 @@ android {
         versionCode = flutter.versionCode
         versionName = flutter.versionName
         manifestPlaceholders["admobAppId"] = findProperty("ADMOB_APP_ID")?.toString()
-            ?: "ca-app-pub-3940256099942544~3347511713"
+            ?: "ca-app-pub-1738145743199175~1335978994"
     }
 
     buildTypes {

@@ -137,14 +137,17 @@ class AppLocalizations {
   String get currentPlan => get('currentPlan');
   String get planFree => get('planFree');
   String get planFreePrice => get('planFreePrice');
+  String get planFreeAds => get('planFreeAds');
   String get planFreeRequests => get('planFreeRequests');
   String get planFreeModules => get('planFreeModules');
   String get planPremium => get('planPremium');
   String get planPremiumPrice => get('planPremiumPrice');
+  String get planPremiumNoAds => get('planPremiumNoAds');
   String get planPremiumRequests => get('planPremiumRequests');
   String get planPremiumModules => get('planPremiumModules');
   String get planPro => get('planPro');
   String get planProPrice => get('planProPrice');
+  String get planProNoAds => get('planProNoAds');
   String get planProRequests => get('planProRequests');
   String get planProModules => get('planProModules');
   String get planProFairUse => get('planProFairUse');
@@ -280,14 +283,17 @@ class AppLocalizations {
     'currentPlan': 'Current',
     'planFree': 'Free',
     'planFreePrice': '\$0 / month',
+    'planFreeAds': 'Ads supported',
     'planFreeRequests': '5 requests per month per module',
     'planFreeModules': 'All 3 modules included',
     'planPremium': 'Premium',
     'planPremiumPrice': '\$3.99 / month',
+    'planPremiumNoAds': 'No ads',
     'planPremiumRequests': '20 requests per day per module',
     'planPremiumModules': 'All 3 modules included',
     'planPro': 'Pro',
     'planProPrice': '\$9.99 / month',
+    'planProNoAds': 'No ads',
     'planProRequests': 'Unlimited access',
     'planProModules': 'All 3 modules included',
     'planProFairUse': 'Fair use policy applies',
@@ -424,14 +430,17 @@ class AppLocalizations {
     'currentPlan': 'Curent',
     'planFree': 'Gratuit',
     'planFreePrice': '\$0 / lună',
+    'planFreeAds': 'Cu reclame',
     'planFreeRequests': '5 cereri pe lună per modul',
     'planFreeModules': 'Toate cele 3 module incluse',
     'planPremium': 'Premium',
     'planPremiumPrice': '\$3,99 / lună',
+    'planPremiumNoAds': 'Fără reclame',
     'planPremiumRequests': '20 cereri pe zi per modul',
     'planPremiumModules': 'Toate cele 3 module incluse',
     'planPro': 'Pro',
     'planProPrice': '\$9,99 / lună',
+    'planProNoAds': 'Fără reclame',
     'planProRequests': 'Acces nelimitat',
     'planProModules': 'Toate cele 3 module incluse',
     'planProFairUse': 'Se aplică politica de utilizare corectă',
