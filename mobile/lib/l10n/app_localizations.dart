@@ -162,7 +162,15 @@ class AppLocalizations {
   String get uploadJd => get('uploadJd');
   String get extractingText => get('extractingText');
   String get removeFile => get('removeFile');
+  String get replaceFile => get('replaceFile');
   String get fileTooLarge => get('fileTooLarge');
+  String get fileConsentTitle => get('fileConsentTitle');
+  String get fileConsentPicker => get('fileConsentPicker');
+  String get fileConsentSelected => get('fileConsentSelected');
+  String get fileConsentTemporary => get('fileConsentTemporary');
+  String get fileConsentNoStorage => get('fileConsentNoStorage');
+  String get fileConsentContinue => get('fileConsentContinue');
+  String get fileUploadError => get('fileUploadError');
 
   // Privacy
   String get privacyTitle => get('privacyTitle');
@@ -307,8 +315,16 @@ class AppLocalizations {
     'uploadCv': 'Upload',
     'uploadJd': 'Upload',
     'extractingText': 'Extracting...',
-    'removeFile': 'Remove file',
+    'removeFile': 'Remove',
+    'replaceFile': 'Replace',
     'fileTooLarge': 'File exceeds 10 MB limit',
+    'fileConsentTitle': 'Upload a Document',
+    'fileConsentPicker': 'Your device\'s file picker will open so you can choose a file.',
+    'fileConsentSelected': 'Only the file you select will be accessed.',
+    'fileConsentTemporary': 'File content is processed temporarily for this request only.',
+    'fileConsentNoStorage': 'Your file is not stored — it is discarded after processing.',
+    'fileConsentContinue': 'Choose File',
+    'fileUploadError': 'Could not extract text from this file.',
 
     // Privacy
     'privacyTitle': 'Privacy & Legal',
@@ -454,8 +470,16 @@ class AppLocalizations {
     'uploadCv': 'Încarcă',
     'uploadJd': 'Încarcă',
     'extractingText': 'Se extrage...',
-    'removeFile': 'Elimină fișierul',
+    'removeFile': 'Elimină',
+    'replaceFile': 'Înlocuiește',
     'fileTooLarge': 'Fișierul depășește limita de 10 MB',
+    'fileConsentTitle': 'Încarcă un Document',
+    'fileConsentPicker': 'Se va deschide selectorul de fișiere al dispozitivului tău.',
+    'fileConsentSelected': 'Doar fișierul pe care îl selectezi va fi accesat.',
+    'fileConsentTemporary': 'Conținutul fișierului este procesat temporar, doar pentru această cerere.',
+    'fileConsentNoStorage': 'Fișierul tău nu este stocat — este eliminat după procesare.',
+    'fileConsentContinue': 'Alege Fișierul',
+    'fileUploadError': 'Nu s-a putut extrage textul din acest fișier.',
 
     // Privacy
     'privacyTitle': 'Confidențialitate și Legal',
