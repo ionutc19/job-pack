@@ -25,7 +25,7 @@ class _FileUploadButtonState extends State<FileUploadButton> {
   bool _uploading = false;
 
   Future<void> _pickAndUpload() async {
-    final result = await FilePicker.platform.pickFiles(
+    final result = await FilePicker.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['pdf', 'docx', 'txt'],
       withData: true,
