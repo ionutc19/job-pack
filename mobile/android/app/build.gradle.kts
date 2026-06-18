@@ -5,9 +5,10 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+val keyPropertiesFile = rootProject.file("key.properties")
+val hasKeyProperties = keyPropertiesFile.exists()
 val keyProperties = Properties().apply {
-    val keyPropertiesFile = rootProject.file("key.properties")
-    if (keyPropertiesFile.exists()) {
+    if (hasKeyProperties) {
         keyPropertiesFile.inputStream().use { load(it) }
     }
 }
@@ -32,18 +33,20 @@ android {
             ?: "ca-app-pub-1738145743199175~1335978994"
     }
 
-    signingConfigs {
-        create("release") {
-            storeFile = file(keyProperties.getProperty("storeFile", ""))
-            storePassword = keyProperties.getProperty("storePassword", "")
-            keyAlias = keyProperties.getProperty("keyAlias", "")
-            keyPassword = keyProperties.getProperty("keyPassword", "")
+    if (hasKeyProperties) {
+        signingConfigs {
+            create("release") {
+                storeFile = file(keyProperties.getProperty("storeFile"))
+                storePassword = keyProperties.getProperty("storePassword")
+                keyAlias = keyProperties.getProperty("keyAlias")
+                keyPassword = keyProperties.getProperty("keyPassword")
+            }
         }
     }
 
     buildTypes {
         release {
-            signingConfig = if (keyProperties.containsKey("storeFile")) {
+            signingConfig = if (hasKeyProperties) {
                 signingConfigs.getByName("release")
             } else {
                 signingConfigs.getByName("debug")
