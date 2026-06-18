@@ -17,9 +17,12 @@ subprojects {
 }
 subprojects {
     project.evaluationDependsOn(":app")
-    project.plugins.whenPluginAdded {
-        if (this is com.android.build.gradle.api.AndroidBasePlugin) {
-            project.extensions.configure<com.android.build.gradle.BaseExtension> {
+}
+
+subprojects {
+    if (project.name != "app") {
+        afterEvaluate {
+            extensions.findByType<com.android.build.gradle.BaseExtension>()?.apply {
                 compileSdkVersion(36)
             }
         }
