@@ -137,4 +137,4 @@ See the full [Privacy Policy](https://ionutc19.github.io/job-pack/privacy-policy
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
+Copyright (c) 2026 Ionut Popa. All rights reserved. This source code is provided for reference purposes only. See [LICENSE](LICENSE) for details.
