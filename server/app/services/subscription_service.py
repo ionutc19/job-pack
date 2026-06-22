@@ -1,3 +1,4 @@
+import json
 import logging
 from datetime import datetime, timezone
 
@@ -14,9 +15,73 @@ PRODUCT_TIER_MAP: dict[str, Tier] = {
     "jobcoach_pro_monthly": Tier.PRO,
 }
 
+_play_service = None
+
 
 def _play_api_configured() -> bool:
     return bool(settings.google_play_credentials_json)
+
+
+def _get_play_service():
+    global _play_service
+    if _play_service is not None:
+        return _play_service
+
+    from google.oauth2.service_account import Credentials
+    from googleapiclient.discovery import build
+
+    creds_raw = settings.google_play_credentials_json
+    creds_dict = json.loads(creds_raw)
+    credentials = Credentials.from_service_account_info(
+        creds_dict,
+        scopes=["https://www.googleapis.com/auth/androidpublisher"],
+    )
+    _play_service = build(
+        "androidpublisher", "v3", credentials=credentials,
+        cache_discovery=False,
+    )
+    return _play_service
+
+
+def _verify_with_google(product_id: str, purchase_token: str) -> dict:
+    """Call Google Play Developer API to verify a subscription purchase."""
+    service = _get_play_service()
+    package = settings.google_play_package
+
+    result = (
+        service.purchases()
+        .subscriptions()
+        .get(
+            packageName=package,
+            subscriptionId=product_id,
+            token=purchase_token,
+        )
+        .execute()
+    )
+
+    payment_state = result.get("paymentState")
+    cancel_reason = result.get("cancelReason")
+    expiry_ms = int(result.get("expiryTimeMillis", 0))
+    expiry_dt = (
+        datetime.fromtimestamp(expiry_ms / 1000, tz=timezone.utc)
+        if expiry_ms
+        else None
+    )
+
+    # paymentState: 0=pending, 1=received, 2=free_trial, 3=deferred
+    # cancelReason: 0=user, 1=system, 2=replaced, 3=developer
+    is_active = (
+        payment_state in (1, 2)
+        and (expiry_dt is None or expiry_dt > datetime.now(timezone.utc))
+    )
+
+    return {
+        "is_active": is_active,
+        "expiry": expiry_dt,
+        "payment_state": payment_state,
+        "cancel_reason": cancel_reason,
+        "raw_expiry_ms": expiry_ms,
+    }
 
 
 async def verify_purchase(
@@ -52,27 +117,75 @@ async def verify_purchase(
             ),
         }
 
-    logger.info(
-        "Would verify purchase: product=%s token=%s...",
-        product_id, purchase_token[:20],
-    )
+    try:
+        gp = _verify_with_google(product_id, purchase_token)
+    except Exception:
+        logger.exception(
+            "Google Play API error for product=%s user=%s",
+            product_id, user_id,
+        )
+        _store_subscription(
+            user_id=user_id,
+            product_id=product_id,
+            purchase_token=purchase_token,
+            status="pending_verification",
+            tier=tier,
+        )
+        return {
+            "valid": False,
+            "error": "verification_failed",
+            "message": "Could not reach Google Play. Purchase stored for retry.",
+        }
+
+    if gp["is_active"]:
+        activate_subscription(
+            user_id=user_id,
+            product_id=product_id,
+            purchase_token=purchase_token,
+            expires_at=gp["expiry"],
+        )
+        logger.info(
+            "Purchase verified: user=%s product=%s tier=%s expires=%s",
+            user_id, product_id, tier.value, gp["expiry"],
+        )
+        return {
+            "valid": True,
+            "tier": tier.value,
+            "expires_at": gp["expiry"].isoformat() if gp["expiry"] else None,
+        }
 
     _store_subscription(
         user_id=user_id,
         product_id=product_id,
         purchase_token=purchase_token,
-        status="pending_verification",
+        status="expired",
         tier=tier,
+        expires_at=gp["expiry"],
     )
-
+    logger.info(
+        "Purchase not active: user=%s product=%s payment_state=%s cancel=%s",
+        user_id, product_id, gp["payment_state"], gp["cancel_reason"],
+    )
     return {
         "valid": False,
-        "error": "verification_not_implemented",
-        "message": (
-            "Play API verification scaffolded but "
-            "not yet active. Purchase stored."
-        ),
+        "error": "purchase_not_active",
+        "message": "Subscription is not active or has expired.",
     }
+
+
+async def verify_purchase_by_token(
+    purchase_token: str, product_id: str,
+) -> dict:
+    """Verify a subscription by token only (for RTDN handler).
+    Returns the Google Play result without modifying any user state."""
+    if not _play_api_configured():
+        return {"error": "verification_unavailable"}
+
+    try:
+        return _verify_with_google(product_id, purchase_token)
+    except Exception:
+        logger.exception("Google Play API error during RTDN verification")
+        return {"error": "verification_failed"}
 
 
 def _store_subscription(

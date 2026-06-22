@@ -10,3 +10,5 @@ psycopg2-binary>=2.9.9,<3.0.0
 alembic>=1.13.0,<2.0.0
 pypdf>=4.0.0,<6.0.0
 python-docx>=1.1.0,<2.0.0
+google-api-python-client>=2.130.0,<3.0.0
+google-auth>=2.29.0,<3.0.0
