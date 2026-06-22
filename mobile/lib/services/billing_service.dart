@@ -109,10 +109,15 @@ class BillingService extends ChangeNotifier {
 
   Future<void> _onPurchaseUpdate(List<PurchaseDetails> purchases) async {
     for (final purchase in purchases) {
+      // Acknowledge FIRST, before any network call
+      if (purchase.pendingCompletePurchase) {
+        await _iap.completePurchase(purchase);
+      }
+
       switch (purchase.status) {
         case PurchaseStatus.purchased:
         case PurchaseStatus.restored:
-          await _verifyAndDeliver(purchase);
+          _verifyWithBackend(purchase);
           break;
         case PurchaseStatus.error:
           _state = BillingState.idle;
@@ -127,14 +132,10 @@ class BillingService extends ChangeNotifier {
         case PurchaseStatus.pending:
           break;
       }
-
-      if (purchase.pendingCompletePurchase) {
-        await _iap.completePurchase(purchase);
-      }
     }
   }
 
-  Future<void> _verifyAndDeliver(PurchaseDetails purchase) async {
+  void _verifyWithBackend(PurchaseDetails purchase) async {
     try {
       final api = ServiceLocator().api;
       final result = await api.verifyPurchase(
@@ -148,8 +149,21 @@ class BillingService extends ChangeNotifier {
       notifyListeners();
     } catch (e) {
       _state = BillingState.idle;
-      _error = 'Verification failed: $e';
+      _error = null;
+      _lastPurchasedTier = _tierFromProductId(purchase.productID);
       notifyListeners();
+      debugPrint('BillingService: backend verification failed: $e');
+    }
+  }
+
+  static String? _tierFromProductId(String productId) {
+    switch (productId) {
+      case _kPremiumId:
+        return 'premium';
+      case _kProId:
+        return 'pro';
+      default:
+        return null;
     }
   }
 
