@@ -31,6 +31,10 @@ mobile/.metadata
 *.swo
 *~
 
+# Runbooks (contain secrets / internal docs)
+docs/jobcoach_runbook*.pdf
+docs/jobcoach_runbook*.html
+
 # OS
 .DS_Store
 Thumbs.db
