@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../l10n/app_localizations.dart';
 
 class PrivacyScreen extends StatelessWidget {
@@ -8,7 +9,19 @@ class PrivacyScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text(l.privacyTitle)),
+      appBar: AppBar(
+        title: Text(l.privacyTitle),
+        actions: [
+          TextButton.icon(
+            onPressed: () => launchUrl(
+              Uri.parse('https://ionutc19.github.io/job-pack/privacy-policy.html'),
+              mode: LaunchMode.externalApplication,
+            ),
+            icon: const Icon(Icons.open_in_new, size: 16),
+            label: Text(l.viewOnline),
+          ),
+        ],
+      ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [

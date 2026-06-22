@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../config/app_config.dart';
 import '../l10n/app_localizations.dart';
 import '../l10n/language_provider.dart';
@@ -155,6 +156,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
             title: Text(l.privacyTitle),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => Navigator.pushNamed(context, '/privacy'),
+          ),
+          ListTile(
+            leading: const Icon(Icons.description_outlined),
+            title: Text(l.termsOfService),
+            trailing: const Icon(Icons.open_in_new, size: 18),
+            onTap: () => launchUrl(
+              Uri.parse('https://ionutc19.github.io/job-pack/terms-of-service.html'),
+              mode: LaunchMode.externalApplication,
+            ),
           ),
         ],
       ),

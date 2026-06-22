@@ -172,6 +172,10 @@ class AppLocalizations {
   String get fileConsentContinue => get('fileConsentContinue');
   String get fileUploadError => get('fileUploadError');
 
+  // Legal
+  String get termsOfService => get('termsOfService');
+  String get viewOnline => get('viewOnline');
+
   // Privacy
   String get privacyTitle => get('privacyTitle');
   String get privacyDataProcessing => get('privacyDataProcessing');
@@ -325,6 +329,10 @@ class AppLocalizations {
     'fileConsentNoStorage': 'Your file is not stored — it is discarded after processing.',
     'fileConsentContinue': 'Choose File',
     'fileUploadError': 'Could not extract text from this file.',
+
+    // Legal
+    'termsOfService': 'Terms of Service',
+    'viewOnline': 'View online',
 
     // Privacy
     'privacyTitle': 'Privacy & Legal',
@@ -482,6 +490,10 @@ class AppLocalizations {
     'fileUploadError': 'Nu s-a putut extrage textul din acest fișier.',
 
     // Privacy
+    // Legal
+    'termsOfService': 'Termeni și Condiții',
+    'viewOnline': 'Vezi online',
+
     'privacyTitle': 'Confidențialitate și Legal',
     'privacyDataProcessing': 'Procesarea Datelor',
     'privacyDataProcessingBody': 'Când folosești Job Coach, datele introduse (text CV, descrieri de job, secțiuni de profil LinkedIn) sunt trimise către serverul nostru pentru procesare. Aceste date sunt transmise securizat și utilizate exclusiv pentru a genera analiza, îmbunătățirile de profil sau scrisoarea de intenție solicitată.',
